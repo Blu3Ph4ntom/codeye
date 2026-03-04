@@ -1,0 +1,33 @@
+# agent internals
+.agent/
+
+# build output
+codeye
+codeye.exe
+dist/
+
+# Go
+*.test
+*.out
+*.prof
+*.trace
+coverage.html
+coverage.out
+
+# goreleaser
+dist/
+
+# macOS
+.DS_Store
+
+# editor
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# cache
+.codeye-cache/
+
+# OS
+Thumbs.db
