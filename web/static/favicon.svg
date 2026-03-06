@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Minimal Dark Background with rounded corners -->
+  <rect width="512" height="512" rx="128" fill="#08090b"/>
+  <!-- Glowing Eye / Code Bracket Concept -->
+  <path d="M120 256c0-70 136-120 136-120s136 50 136 120-136 120-136 120-136-50-136-120z" fill="none" stroke="#3fcf8e" stroke-width="32" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="48" fill="#3fcf8e"/>
+  <!-- Minimal Bracket hints -->
+  <path d="M100 180v-40h40M412 180v-40h-40M100 332v40h40M412 332v40h-40" stroke="#3fcf8e" stroke-width="24" fill="none" stroke-linecap="round"/>
+</svg>
