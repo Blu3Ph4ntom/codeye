@@ -76,7 +76,7 @@ func DefaultConfig() *Config {
 		Sort:            "lines",
 		Top:             0, // 0 = show all
 		Theme:           "dark",
-		NerdFont:        os.Getenv("CODEYE_NO_NERD_FONTS") != "1", // on by default; CODEYE_NO_NERD_FONTS=1 to use emoji
+		NerdFont:        os.Getenv("CODEYE_NERD_FONTS") == "1" || os.Getenv("NERD_FONTS") == "1", // opt-in; set CODEYE_NERD_FONTS=1 or use --nf flag
 		HistoryInterval: "week",
 		HistoryLimit:    500,
 		Workers:         runtime.GOMAXPROCS(0),

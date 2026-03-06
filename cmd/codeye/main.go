@@ -92,9 +92,11 @@ if len(args) > 0 {
 dir = args[0]
 }
 cfg := flagsToConfig(f)
-		// --nf flag only overrides the default (true) or env var when explicitly passed.
+		// --nf flag enables Nerd Fonts; env var CODEYE_NERD_FONTS=1 also enables it (already in cfg from DefaultConfig).
 		if cmd.Flags().Changed("nf") {
 			cfg.NerdFont = f.nerdFont
+		} else {
+			// keep DefaultConfig value (env var may have set it)
 		}
 		return runScan(dir, cfg)
 },
@@ -130,7 +132,7 @@ cmd.Flags().BoolVar(&f.compact, "compact", false, "single-line summary")
 	cmd.Flags().BoolVar(&f.pct, "pct", true, "show percentage column")
 	cmd.Flags().BoolVar(&f.progress, "progress", false, "show live progress bar")
 	cmd.Flags().BoolVar(&f.emoji, "emoji", true, "language emoji icons")
-    cmd.Flags().BoolVar(&f.nerdFont, "nf", true, "use Nerd Font glyphs (default: on; --nf=false for emoji fallback)")
+    cmd.Flags().BoolVar(&f.nerdFont, "nf", false, "use Nerd Font glyphs (requires a patched font: JetBrainsMono NF, FiraCode NF, etc.)")
 	cmd.Flags().StringVar(&f.theme, "theme", "dark", "color theme: dark|light|mono")
 // Analysis
 cmd.Flags().BoolVarP(&f.history, "history", "H", false, "LoC growth over git history")
