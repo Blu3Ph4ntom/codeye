@@ -344,52 +344,71 @@ func parseNumstat(out string) []LogEntry {
 	return entries
 }
 
+// parseBlame correctly parses git blame --porcelain output.
+//
+// Porcelain format per line:
+//   HASH orig_line final_line [num_lines]    <- commit header (num_lines only on first occurrence)
+//   author NAME                              <- metadata (only on first occurrence of hash)
+//   author-mail <EMAIL>
+//   ... more metadata ...
+//   filename FILE
+//   \tSOURCE LINE                            <- always present, exactly one per commit header
+//
+// Bug in previous version: subsequent commit headers have only 3 parts (no num_lines),
+// so len(parts) >= 4 was false and those lines were skipped — causing a massive undercount.
+// Correct approach: track currentHash as we walk, write into emailMap when we see
+// author-mail, and increment count on every tab-prefixed line.
 func parseBlame(out string) map[string]int64 {
 	counts := make(map[string]int64)
 	emailMap := make(map[string]string) // hash -> email
 
-	lines := strings.Split(out, "\n")
-	for i := 0; i < len(lines); i++ {
-		line := lines[i]
+	var currentHash string
+
+	for _, line := range strings.Split(out, "\n") {
 		if line == "" {
 			continue
 		}
 
-		// A line starting with a tab is a code line.
-		if strings.HasPrefix(line, "\t") {
-			// This shouldn't happen before we see a commit info line,
-			// but we'll handle it by just skipping.
+		// Tab-prefixed line = one actual source line owned by currentHash.
+		if line[0] == '\t' {
+			if email := emailMap[currentHash]; email != "" {
+				counts[email]++
+			}
 			continue
 		}
 
-		parts := strings.Fields(line)
-		if len(parts) >= 4 && len(parts[0]) >= 7 {
-			// This is likely a commit info line: <sha> <src> <dst> <n>
-			hash := parts[0]
-			email, ok := emailMap[hash]
-
-			// Scan forward for metadata (author-mail) and then the tabbed code line
-			for j := i + 1; j < len(lines); j++ {
-				inner := lines[j]
-				if strings.HasPrefix(inner, "author-mail ") && !ok {
-					email = strings.TrimPrefix(inner, "author-mail ")
-					email = strings.TrimSpace(strings.Trim(email, "<>"))
-					emailMap[hash] = email
-					ok = true
-				} else if strings.HasPrefix(inner, "\t") {
-					// Found the code line for this commit block
-					if ok && email != "" {
-						counts[email]++
-					}
-					i = j // Advance main loop
-					break
-				} else if len(inner) > 40 && !strings.Contains(inner[:8], " ") {
-					// Hit next commit block without finding tab? (Shouldn't happen in porcelain)
-					i = j - 1
-					break
+		// author-mail line: capture the email for currentHash (first occurrence only).
+		if strings.HasPrefix(line, "author-mail ") {
+			// Only store the first time we see it; subsequent occurrences of the same
+			// hash have no metadata block so this branch simply won't fire again.
+			if _, alreadyKnown := emailMap[currentHash]; !alreadyKnown {
+				raw := strings.TrimPrefix(line, "author-mail ")
+				email := strings.Trim(strings.TrimSpace(raw), "<>")
+				if email != "" {
+					emailMap[currentHash] = email
 				}
 			}
+			continue
+		}
+
+		// Commit header: HASH orig final [num]
+		// A valid commit hash is exactly 40 lowercase hex characters.
+		parts := strings.Fields(line)
+		if len(parts) >= 3 && len(parts[0]) == 40 && isHex(parts[0]) {
+			currentHash = parts[0]
+			// No placeholder needed: emailMap will be populated when we see author-mail.
+			// For repeated hashes (no metadata block), currentHash retains its email from first occurrence.
 		}
 	}
 	return counts
+}
+
+// isHex returns true if s consists only of lowercase hex digits.
+func isHex(s string) bool {
+	for _, c := range s {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+			return false
+		}
+	}
+	return true
 }
