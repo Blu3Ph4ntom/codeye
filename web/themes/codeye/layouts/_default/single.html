@@ -1,0 +1,19 @@
+{{ define "main" }}
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-title">Documentation</div>
+    <ul class="docs-nav">
+      {{ range .Site.Menus.docs }}
+      <li><a href="{{ .URL }}"{{ if eq $.RelPermalink .URL }} class="active"{{ end }}>{{ .Name }}</a></li>
+      {{ end }}
+    </ul>
+  </aside>
+
+  <main class="docs-content">
+    <div class="docs-breadcrumb">
+      <a href="/">codeye</a> / <a href="/docs/">docs</a>{{ if not .IsSection }} / {{ .Title }}{{ end }}
+    </div>
+    {{ .Content }}
+  </main>
+</div>
+{{ end }}

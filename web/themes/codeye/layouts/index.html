@@ -1,0 +1,195 @@
+{{ define "main" }}
+
+<!-- ─── Hero ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="pulse"></span>
+    {{ .Site.Params.version }} · Open Source
+  </div>
+
+  <h1>Eyes on your code,<br><span class="hl">instantly.</span></h1>
+  <p class="hero-sub">{{ .Site.Params.subtitle }}</p>
+
+  <div class="hero-actions">
+    <a href="/docs/install/" class="btn btn-primary">
+      Get started →
+    </a>
+    <a href="https://github.com/codeye/codeye" class="btn btn-outline" target="_blank" rel="noopener">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+
+  <div
+    class="install-pill"
+    data-cmd="go install github.com/codeye/codeye/cmd/codeye@latest"
+    style="margin:0 auto;max-width:500px"
+  >
+    <span class="prompt">$</span>
+    <span>go install github.com/codeye/codeye/cmd/codeye@latest</span>
+    <button class="copy-btn" type="button">copy</button>
+  </div>
+
+  <!-- terminal demo -->
+  <div style="margin-top:3.5rem">
+    <div class="term-wrap">
+      <div class="term-bar">
+        <span class="term-dot r"></span>
+        <span class="term-dot y"></span>
+        <span class="term-dot g"></span>
+        <span class="term-title">~/projects/myapp</span>
+      </div>
+      <div class="term-body">
+        <div><span class="t-prompt">❯</span> <span class="t-cmd">codeye</span></div>
+        <div class="t-dim" style="margin:.2rem 0 .5rem">codeye · main · 45 files · 11ms</div>
+        <span class="t-header">  Language           Files      Code  Comments    Blanks     Total      %</span>
+        <div><span class="t-bar">▌ </span><span class="t-lang">Go                    28     </span><span class="t-num">3,733</span>    <span class="t-num">  272</span>     <span class="t-num">  441</span>     <span class="t-num">4,446</span>  <span class="t-pct">77.0%</span></div>
+        <div><span class="t-bar">▌ </span><span class="t-lang">TypeScript            12     </span><span class="t-num">2,104</span>    <span class="t-num">  188</span>     <span class="t-num">  310</span>     <span class="t-num">2,602</span>  <span class="t-pct">16.1%</span></div>
+        <div><span class="t-bar">▌ </span><span class="t-lang">Markdown               4     </span><span class="t-num">  433</span>    <span class="t-num">    0</span>     <span class="t-num">  126</span>     <span class="t-num">  559</span>  <span class="t-pct"> 3.5%</span></div>
+        <div><span class="t-bar">▌ </span><span class="t-lang">Shell                  1     </span><span class="t-num">   56</span>    <span class="t-num">    3</span>     <span class="t-num">   14</span>     <span class="t-num">   73</span>  <span class="t-pct"> 0.5%</span></div>
+        <div style="border-top:1px solid #21262d;margin:.4rem 0"></div>
+        <div><span class="t-total">  Total                45     6,326       463       891     7,680  100.0%</span></div>
+        <div style="margin-top:.6rem"><span class="t-ok">✓</span> <span class="t-dim">11ms · cache miss · dc7f118f</span></div>
+        <br>
+        <div><span class="t-prompt">❯</span> <span class="t-cmd">codeye --blame</span></div>
+        <div class="t-dim" style="margin:.3rem 0 .4rem">running blame (may take a moment)...</div>
+        <div><span class="t-lang">alice@example.com   </span><span class="t-num">  5,591</span>  <span class="t-pct">89.1%</span>  <span class="t-num"> 38</span> files  <span class="t-bar">████████████████████████████████████</span></div>
+        <div><span class="t-lang">bob@example.com     </span><span class="t-num">    685</span>  <span class="t-pct">10.9%</span>  <span class="t-num">  7</span> files  <span class="t-bar">████</span></div>
+        <div style="margin-top:.5rem" class="t-dim">total: 6,276 lines across 2 authors</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Stats ─────────────────────────────────────────────────────────── -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-val"><span>≤</span>15ms</div>
+    <div class="stat-label">cache hit</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val"><span>≤</span>100ms</div>
+    <div class="stat-label">100k-line repo</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">25<span>+</span></div>
+    <div class="stat-label">languages</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">0</div>
+    <div class="stat-label">config required</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">1</div>
+    <div class="stat-label">static binary</div>
+  </div>
+</div>
+
+<!-- ─── Features ─────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">What it does</div>
+    <h2 class="section-h">Everything you need,<br>nothing you don't.</h2>
+    <p class="section-sub">Built for engineers who want answers in milliseconds, not megabytes of tool overhead.</p>
+
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Sub-100ms scans</h3>
+        <p>Parallel goroutine pool + msgpack cache. Fast on first run, instant on repeat. No index to maintain.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Line-level breakdown</h3>
+        <p>Code, comments, and blank lines counted separately per language. Not just totals — actual signal.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <h3>Git blame rollup</h3>
+        <p>Per-author line ownership across the whole repo, not just one file. See who owns what, fast.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Growth history</h3>
+        <p>Week-by-week LoC growth with sparklines. Watch your codebase evolve over time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Hotspot detection</h3>
+        <p>Files with the most churn relative to size. Find the code that changes the most.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📤</div>
+        <h3>Multiple formats</h3>
+        <p>Table, JSON, CSV, Markdown, badge — pipe into scripts, CI, or dashboards. Your data, your pipeline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Quick Start ───────────────────────────────────────────────────── -->
+<section class="section" style="border-top:1px solid var(--border)">
+  <div class="container" style="max-width:720px">
+    <div class="section-label">Quick start</div>
+    <h2 class="section-h">Up in 30 seconds.</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Install</h3>
+          <div class="install-pill" data-cmd="go install github.com/codeye/codeye/cmd/codeye@latest" style="display:inline-flex">
+            <span class="prompt">$</span>
+            <span>go install github.com/codeye/codeye/cmd/codeye@latest</span>
+            <button class="copy-btn" type="button">copy</button>
+          </div>
+          <p style="margin-top:.6rem">Or download a pre-built binary from <a href="https://github.com/codeye/codeye/releases">Releases</a>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Scan a repo</h3>
+          <pre class="codeblock"><span class="prompt" style="color:var(--accent)">$</span> cd ~/projects/myapp
+<span class="prompt" style="color:var(--accent)">$</span> codeye</pre>
+          <p>Run inside any git repository. No flags required.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Go deeper</h3>
+          <pre class="codeblock"><span class="cm"># Blame by author</span>
+<span class="prompt" style="color:var(--accent)">$</span> codeye --blame
+
+<span class="cm"># Week-by-week growth</span>
+<span class="prompt" style="color:var(--accent)">$</span> codeye --history
+
+<span class="cm"># Most-changed files</span>
+<span class="prompt" style="color:var(--accent)">$</span> codeye --hotspot
+
+<span class="cm"># Export JSON for CI</span>
+<span class="prompt" style="color:var(--accent)">$</span> codeye --format json</pre>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:2.5rem;color:var(--muted);font-size:.9rem">
+      Read the full <a href="/docs/usage/">usage reference →</a>
+    </p>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────────────────── -->
+<section class="section-sm" style="border-top:1px solid var(--border);text-align:center">
+  <div class="container">
+    <h2 style="font-size:1.9rem;margin-bottom:.6rem">Ready to see your code clearly?</h2>
+    <p style="color:var(--muted);margin-bottom:2rem">Open source, MIT licensed, zero telemetry.</p>
+    <a href="/docs/install/" class="btn btn-primary" style="margin-right:.75rem">Install now →</a>
+    <a href="https://github.com/codeye/codeye" class="btn btn-outline" target="_blank" rel="noopener">Star on GitHub</a>
+  </div>
+</section>
+
+{{ end }}

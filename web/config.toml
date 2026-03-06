@@ -1,10 +1,29 @@
-baseURL = 'https://codeye.dev/'
-languageCode = 'en-us'
-title = 'codeye'
-theme = 'minimalist'
+baseURL = "https://codeye.dev/"
+languageCode = "en-us"
+title = "codeye"
+theme = "codeye"
+enableRobotsTXT = true
 
 [params]
-  description = 'Fastest LoC scanner for git repositories'
-  github = 'https://github.com/codeye/codeye'
-  author = 'dev@codeye.dev'
-  gopher_vibe = true
+  tagline   = "Eyes on your code, instantly."
+  subtitle  = "Sub-100ms lines-of-code scanner for git repos. Blame, history, hotspots — single static binary, zero config."
+  version   = "v0.1.0"
+  githubURL = "https://github.com/codeye/codeye"
+
+[menu]
+  [[menu.docs]]
+    name   = "Install"
+    url    = "/docs/install/"
+    weight = 1
+  [[menu.docs]]
+    name   = "Usage"
+    url    = "/docs/usage/"
+    weight = 2
+  [[menu.docs]]
+    name   = "Config"
+    url    = "/docs/config/"
+    weight = 3
+  [[menu.docs]]
+    name   = "Formats"
+    url    = "/docs/formats/"
+    weight = 4
