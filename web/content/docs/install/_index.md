@@ -12,14 +12,14 @@ codeye ships as a single static binary — no runtime, no CGO, no dependencies.
 The quickest way if you have Go 1.22+:
 
 ```bash
-go install github.com/codeye/codeye/cmd/codeye@latest
+go install github.com/blu3ph4ntom/codeye/cmd/codeye@latest
 ```
 
 The binary lands in `$GOPATH/bin` (usually `~/go/bin`). Make sure that's on your `$PATH`.
 
 ## Pre-built binaries
 
-Download from the [Releases page](https://github.com/codeye/codeye/releases):
+Download from the [Releases page](https://github.com/blu3ph4ntom/codeye/releases):
 
 | Platform | File |
 |----------|------|

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/codeye/codeye/internal/output"
-	"github.com/codeye/codeye/internal/scanner"
+	"github.com/blu3ph4ntom/codeye/internal/output"
+	"github.com/blu3ph4ntom/codeye/internal/scanner"
 )
 
 func makeResult() *scanner.ScanResult {

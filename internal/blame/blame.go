@@ -5,7 +5,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/codeye/codeye/internal/git"
+	"github.com/blu3ph4ntom/codeye/internal/git"
 )
 
 // AuthorOwnership holds line ownership stats for one author.

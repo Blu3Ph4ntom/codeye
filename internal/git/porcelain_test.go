@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/codeye/codeye/internal/git"
+	"github.com/blu3ph4ntom/codeye/internal/git"
 )
 
 func setupRepo(t *testing.T) string {

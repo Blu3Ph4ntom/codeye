@@ -4,7 +4,7 @@ package output
 import (
 	"io"
 
-	"github.com/codeye/codeye/internal/scanner"
+	"github.com/blu3ph4ntom/codeye/internal/scanner"
 )
 
 // RenderOpts carries display preferences to renderers.

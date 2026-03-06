@@ -1,5 +1,5 @@
 BINARY    := codeye
-MODULE    := github.com/codeye/codeye
+MODULE    := github.com/blu3ph4ntom/codeye
 CMD       := ./cmd/codeye
 
 VERSION   := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")

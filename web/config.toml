@@ -8,7 +8,7 @@ enableRobotsTXT = true
   tagline   = "Eyes on your code, instantly."
   subtitle  = "Sub-100ms lines-of-code scanner for git repos. Blame, history, hotspots — single static binary, zero config."
   version   = "v0.1.0"
-  githubURL = "https://github.com/codeye/codeye"
+  githubURL = "https://github.com/blu3ph4ntom/codeye"
 
 [menu]
   [[menu.docs]]

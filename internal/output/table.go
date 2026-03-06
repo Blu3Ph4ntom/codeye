@@ -5,7 +5,7 @@ import (
 "io"
 "strings"
 
-"github.com/codeye/codeye/internal/scanner"
+"github.com/blu3ph4ntom/codeye/internal/scanner"
 "github.com/dustin/go-humanize"
 "github.com/muesli/termenv"
 )

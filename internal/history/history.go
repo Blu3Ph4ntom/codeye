@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/codeye/codeye/internal/git"
+	"github.com/blu3ph4ntom/codeye/internal/git"
 )
 
 // DataPoint is a single point in time with LoC added/removed.

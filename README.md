@@ -48,16 +48,16 @@ curl -sSfL https://raw.githubusercontent.com/codeye/codeye/main/install.sh | sh
 ### Go install
 
 ```sh
-go install github.com/codeye/codeye/cmd/codeye@latest
+go install github.com/blu3ph4ntom/codeye/cmd/codeye@latest
 ```
 
 ### Download binary
 
-Pre-built binaries for Linux, macOS, Windows, and FreeBSD are available on the [releases page](https://github.com/codeye/codeye/releases).
+Pre-built binaries for Linux, macOS, Windows, and FreeBSD are available on the [releases page](https://github.com/blu3ph4ntom/codeye/releases).
 
 ```sh
 # Linux amd64
-curl -sSfL https://github.com/codeye/codeye/releases/latest/download/codeye_linux_amd64.tar.gz | tar xz
+curl -sSfL https://github.com/blu3ph4ntom/codeye/releases/latest/download/codeye_linux_amd64.tar.gz | tar xz
 sudo mv codeye /usr/local/bin/
 ```
 
@@ -235,7 +235,7 @@ Repeated scans hit the content-addressable cache and complete in <5ms regardless
 ## Building from Source
 
 ```sh
-git clone https://github.com/codeye/codeye.git
+git clone https://github.com/blu3ph4ntom/codeye.git
 cd codeye
 make build
 ./codeye --version

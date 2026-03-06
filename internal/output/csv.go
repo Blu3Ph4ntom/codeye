@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/codeye/codeye/internal/scanner"
+	"github.com/blu3ph4ntom/codeye/internal/scanner"
 )
 
 // CSVRenderer renders scan results as CSV.

@@ -110,7 +110,7 @@ release:
 
     **Go install:**
     ```
-    go install github.com/codeye/codeye/cmd/codeye@latest
+    go install github.com/blu3ph4ntom/codeye/cmd/codeye@latest
     ```
 
 brews:
@@ -119,7 +119,7 @@ brews:
       owner: codeye
       name: homebrew-tap
     directory: Formula
-    homepage: "https://github.com/codeye/codeye"
+    homepage: "https://github.com/blu3ph4ntom/codeye"
     description: "Fast lines-of-code scanner for git repositories"
     license: "MIT"
     test: |
@@ -138,7 +138,7 @@ nfpms:
       - rpm
       - apk
     vendor: codeye
-    homepage: https://github.com/codeye/codeye
+    homepage: https://github.com/blu3ph4ntom/codeye
     maintainer: "codeye <hello@codeye.dev>"
     description: "Fast lines-of-code scanner for git repositories"
     license: MIT

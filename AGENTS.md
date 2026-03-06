@@ -5,7 +5,7 @@
 `codeye` — CLI Lines-of-Code scanner for git repositories.
 Single static binary. Sub-100ms scans. Git porcelain only. No CGO.
 
-Module path: `github.com/codeye/codeye`
+Module path: `github.com/blu3ph4ntom/codeye`
 Language: Go 1.22+
 Build constraint: `CGO_ENABLED=0`
 

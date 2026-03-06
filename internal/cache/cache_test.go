@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/codeye/codeye/internal/cache"
+	"github.com/blu3ph4ntom/codeye/internal/cache"
 )
 
 func TestCacheRoundtrip(t *testing.T) {

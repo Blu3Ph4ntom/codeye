@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/codeye/codeye/internal/scanner"
+	"github.com/blu3ph4ntom/codeye/internal/scanner"
 )
 
 // CompactRenderer renders a single line summary of the scan results.

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/codeye/codeye/internal/scanner"
+	"github.com/blu3ph4ntom/codeye/internal/scanner"
 )
 
 // MarkdownRenderer renders a summary as a markdown table.
