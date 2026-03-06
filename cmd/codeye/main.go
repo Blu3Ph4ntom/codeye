@@ -92,18 +92,18 @@ if len(args) > 0 {
 dir = args[0]
 }
 cfg := flagsToConfig(f)
-		// Priority: explicit --nf flag > CODEYE_NERD_FONTS env > font marker (codeye font install) > default (emoji).
+		// --nf flag enables Nerd Fonts; env var CODEYE_NERD_FONTS=1 also enables it (already in cfg from DefaultConfig).
 		if cmd.Flags().Changed("nf") {
-			cfg.NerdFont = f.nerdFont // explicit flag wins
-		} else if !cfg.NerdFont && nfInstalled() {
-			cfg.NerdFont = true // auto-activate after codeye font install
+			cfg.NerdFont = f.nerdFont
+		} else {
+			// keep DefaultConfig value (env var may have set it)
 		}
 		return runScan(dir, cfg)
 },
 }
 
 addFlags(cmd, f)
-cmd.AddCommand(versionCmd(), doctorCmd(), cacheManageCmd(), langsCmd(), diffCmd(), completionCmd(cmd), fontCmd())
+cmd.AddCommand(versionCmd(), doctorCmd(), cacheManageCmd(), langsCmd(), diffCmd(), completionCmd(cmd))
 return cmd
 }
 
