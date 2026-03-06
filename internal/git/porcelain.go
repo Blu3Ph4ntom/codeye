@@ -82,13 +82,21 @@ func (r *Repo) LastCommitTime() string {
 
 // ListFiles returns the list of git-tracked files for the given ref.
 // If ref is empty, uses the index (working tree tracked files).
-// Uses -z for null-byte separation to handle filenames with spaces/newlines.
-func (r *Repo) ListFiles(ref string, extraArgs ...string) ([]string, error) {
+// It respects .gitignore and --exclude patterns if running against the working tree.
+func (r *Repo) ListFiles(ref string, excludePatterns []string) ([]string, error) {
 	args := []string{"ls-files", "-z"}
 	if ref != "" {
 		args = append(args, "--with-tree="+ref)
 	}
-	args = append(args, extraArgs...)
+
+	for _, p := range excludePatterns {
+		args = append(args, "--exclude="+p)
+	}
+
+	// Always exclude .git and handle .codeyeignore if it exists
+	if _, err := os.Stat(filepath.Join(r.Root, ".codeyeignore")); err == nil {
+		args = append(args, "--exclude-from=.codeyeignore")
+	}
 
 	out, err := runGitRaw(r.Root, args...)
 	if err != nil {

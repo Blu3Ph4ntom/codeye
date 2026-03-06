@@ -93,7 +93,7 @@ func TestListFiles(t *testing.T) {
 	dir := setupRepo(t)
 	repo, _ := git.Discover(dir)
 
-	files, err := repo.ListFiles("")
+	files, err := repo.ListFiles("", nil)
 	if err != nil {
 		t.Fatalf("ListFiles: %v", err)
 	}
