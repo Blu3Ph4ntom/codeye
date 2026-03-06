@@ -1,0 +1,10 @@
+baseURL = 'https://codeye.dev/'
+languageCode = 'en-us'
+title = 'codeye'
+theme = 'minimalist'
+
+[params]
+  description = 'Fastest LoC scanner for git repositories'
+  github = 'https://github.com/codeye/codeye'
+  author = 'dev@codeye.dev'
+  gopher_vibe = true
