@@ -5,6 +5,7 @@ import (
 "fmt"
 "os"
 "os/exec"
+	"path/filepath"
 "runtime"
 "strconv"
 "strings"
@@ -197,13 +198,21 @@ return cfg
 }
 
 func runScan(dir string, cfg *config.Config) error {
-repo, err := git.Discover(dir)
-if err != nil {
-return fmt.Errorf("%s is not inside a git repository", dir)
-}
-if cfg.Verbose {
-fmt.Fprintf(os.Stderr, "repo: %s\n", repo.Root)
-}
+	repo, err := git.Discover(dir)
+	if err != nil {
+		if cfg.Verbose {
+			fmt.Fprintf(os.Stderr, "not a git repo, falling back to directory scan: %v\n", err)
+		}
+		// Fallback: limited directory scan (no history/blame/hotspots)
+		if cfg.History || cfg.Blame || cfg.Hotspots {
+			return fmt.Errorf("--history, --blame, and --hotspots require a git repository")
+		}
+		return runDirectoryScan(dir, cfg, os.Stdout)
+	}
+
+	if cfg.Verbose {
+		fmt.Fprintf(os.Stderr, "repo: %s\n", repo.Root)
+	}
 switch {
 case cfg.Speedtest:
 return runSpeedtest(repo, cfg)
@@ -213,9 +222,66 @@ case cfg.Blame:
 return runBlameMode(repo, cfg)
 case cfg.Hotspots:
 return runHotspotsMode(repo, cfg)
-default:
-return runStandardScan(repo, cfg, os.Stdout)
+	default:
+		return runStandardScan(repo, cfg, os.Stdout)
+	}
 }
+
+func runDirectoryScan(dir string, cfg *config.Config, w *os.File) error {
+	start := time.Now()
+	abs, err := filepath.Abs(dir)
+	if err != nil {
+		return err
+	}
+
+	files, err := scanner.WalkDir(abs, cfg.Exclude)
+	if err != nil {
+		return fmt.Errorf("walking directory: %w", err)
+	}
+
+	scanOpts := scanner.ScanOpts{
+		RepoRoot:    abs,
+		Exclude:     cfg.Exclude,
+		Include:     cfg.PathFilter,
+		NoVendor:    cfg.NoVendor,
+		NoGenerated: cfg.NoGenerated,
+		NoTests:     cfg.NoTests,
+		LangFilter:  cfg.Lang,
+		MinLines:    cfg.MinLines,
+		Workers:     cfg.Workers,
+		DryRun:      cfg.DryRun,
+	}
+	files = scanner.FilterFiles(files, scanOpts)
+
+	if cfg.DryRun {
+		for _, f := range files {
+			fmt.Fprintln(w, f)
+		}
+		return nil
+	}
+
+	result, err := scanner.Scan(files, abs, scanOpts)
+	if err != nil {
+		return fmt.Errorf("scan failed: %w", err)
+	}
+
+	result.ScanMs = time.Since(start).Milliseconds()
+	result.Repo = abs
+
+	renderer := output.Get(cfg.Format)
+	opts := output.RenderOpts{
+		NoColor:  cfg.NoColor,
+		NoHeader: cfg.NoHeader,
+		Wide:     cfg.Wide,
+		Compact:  cfg.Compact,
+		Pct:      cfg.Pct,
+		NerdFont: cfg.NerdFont,
+		Theme:    cfg.Theme,
+		Top:      cfg.Top,
+		Sort:     cfg.Sort,
+		Desc:     cfg.Desc,
+	}
+	return renderer.Render(w, result, opts)
 }
 
 func runStandardScan(repo *git.Repo, cfg *config.Config, w *os.File) error {
