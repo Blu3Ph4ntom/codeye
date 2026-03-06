@@ -4,7 +4,7 @@
 
 set -e
 
-REPO="codeye/codeye"
+REPO="blu3ph4ntom/codeye"
 BINARY="codeye"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 

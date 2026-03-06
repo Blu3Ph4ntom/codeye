@@ -36,7 +36,7 @@ codeye · main · 25 files · 10ms
 ### Homebrew (macOS / Linux)
 
 ```sh
-brew install codeye/tap/codeye
+brew install blu3ph4ntom/tap/codeye
 ```
 
 ### One-line installer (Linux / macOS)
