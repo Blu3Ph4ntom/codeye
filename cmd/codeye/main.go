@@ -92,7 +92,11 @@ if len(args) > 0 {
 dir = args[0]
 }
 cfg := flagsToConfig(f)
-return runScan(dir, cfg)
+		// --nf flag only overrides the default (true) or env var when explicitly passed.
+		if cmd.Flags().Changed("nf") {
+			cfg.NerdFont = f.nerdFont
+		}
+		return runScan(dir, cfg)
 },
 }
 
@@ -126,7 +130,7 @@ cmd.Flags().BoolVar(&f.compact, "compact", false, "single-line summary")
 	cmd.Flags().BoolVar(&f.pct, "pct", true, "show percentage column")
 	cmd.Flags().BoolVar(&f.progress, "progress", false, "show live progress bar")
 	cmd.Flags().BoolVar(&f.emoji, "emoji", true, "language emoji icons")
-	cmd.Flags().BoolVar(&f.nerdFont, "nf", false, "Nerd Font glyphs instead of emoji (requires patched terminal font)")
+    cmd.Flags().BoolVar(&f.nerdFont, "nf", true, "use Nerd Font glyphs (default: on; --nf=false for emoji fallback)")
 	cmd.Flags().StringVar(&f.theme, "theme", "dark", "color theme: dark|light|mono")
 // Analysis
 cmd.Flags().BoolVarP(&f.history, "history", "H", false, "LoC growth over git history")
@@ -171,7 +175,7 @@ cfg.Compact = f.compact
 cfg.Pct = f.pct
 cfg.Progress = f.progress
 cfg.Emoji = f.emoji
-cfg.NerdFont = f.nerdFont || cfg.NerdFont // also respect env var from DefaultConfig
+	// NerdFont: don't override here — RunE applies cmd.Flags().Changed("nf") for explicit flag handling.
 cfg.Theme = f.theme
 cfg.History = f.history
 cfg.HistoryInterval = f.historyInterval
