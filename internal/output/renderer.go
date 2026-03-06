@@ -14,8 +14,7 @@ type RenderOpts struct {
 	Wide      bool
 	Compact   bool
 	Pct       bool
-	Emoji     bool
-	NerdFont  bool // use Nerd Font glyphs instead of emoji (requires Nerd Font in terminal)
+	NerdFont  bool // use Nerd Font glyphs (requires a patched Nerd Font in terminal)
 	Theme     string
 	Top       int
 	Sort      string

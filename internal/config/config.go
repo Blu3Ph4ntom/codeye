@@ -38,7 +38,6 @@ type Config struct {
 	Compact  bool
 	Pct      bool
 	Progress  bool
-	Emoji     bool
 	NerdFont  bool // use Nerd Font terminal glyphs (requires patched font)
 	Theme     string
 

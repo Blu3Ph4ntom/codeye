@@ -41,7 +41,7 @@ func (b *BarRenderer) Render(w io.Writer, result *scanner.ScanResult, opts Rende
 
 	blocks := []string{"▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"}
 
-	for i, l := range langs {
+	for _, l := range langs {
 		pct := float64(l.Lines) / float64(result.Total.Lines) * 100
 		barFrac := float64(l.Lines) / float64(maxLines) * float64(barWidth)
 		full := int(barFrac)
@@ -56,7 +56,7 @@ func (b *BarRenderer) Render(w io.Writer, result *scanner.ScanResult, opts Rende
 			bar += blocks[idx]
 		}
 
-		color := langColors[uint32(i)%uint32(len(langColors))]
+		color := brandColorFor(l.Name)
 		styledBar := termenv.String(bar).Foreground(prof.Color(color)).String()
 
 		fmt.Fprintf(w, " %-*s  %s%-*s  %5.1f%%  %s\n",

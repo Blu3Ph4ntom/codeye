@@ -13,94 +13,100 @@ import (
 // TableRenderer renders scan results as a formatted table.
 type TableRenderer struct{}
 
-// langEmoji maps language names to emoji icons.
-// These are plain Unicode emoji — no special fonts required.
-// Chosen to have a real semantic connection to the language or ecosystem.
-var langEmoji = map[string]string{
+// langBrandColors maps language names to their GitHub Linguist / official brand hex colors.
+// These are rendered via ANSI true-color — zero setup, works in every modern terminal.
+var langBrandColors = map[string]string{
 	// ── Systems ──────────────────────────────────────────
-	"Go":            "🐹 ", // Gopher — Go's official mascot
-	"Rust":          "🦀 ", // Ferris — Rust's mascot
-	"C":             "⚙️  ", // gear — systems-level
-	"C++":           "⚙️  ", // gear — systems-level
-	"C#":            "🎵 ", // C# is literally a musical note
-	"Zig":           "⚡ ", // lightning — Zig's speed focus
+	"Go":            "#00ADD8", // Go gopher blue
+	"Rust":          "#DEA584", // Rust official orange
+	"C":             "#A8B9CC", // C logo blue-grey
+	"C++":           "#F34B7D", // Linguist pink
+	"C#":            "#178600", // Linguist green
+	"Zig":           "#EC915C", // Zig orange
+	"D":             "#BA595E",
+	"Nim":           "#FFE953",
+	"Assembly":      "#6E4C13",
 	// ── Scripted ─────────────────────────────────────────
-	"Python":        "🐍 ", // snake — Python's mascot
-	"Ruby":          "💎 ", // ruby gem
-	"PHP":           "🐘 ", // Ellie the elephant — PHP's mascot
-	"Perl":          "🧅 ", // onion — Perl's logo shape
-	"Lua":           "🌙 ", // moon — Lua means "moon" in Portuguese
+	"Python":        "#3572A5", // Python blue
+	"Ruby":          "#CC342D", // Ruby red
+	"PHP":           "#4F5D95", // PHP indigo
+	"Perl":          "#0298C3",
+	"Lua":           "#4080D0", // lightened from Linguist navy
+	"R":             "#198CE7",
+	"Julia":         "#9558B2",
 	// ── JVM ──────────────────────────────────────────────
-	"Java":          "☕ ", // coffee — Java's origin story
-	"Kotlin":        "🎯 ", // target — Kotlin island shape
-	"Scala":         "🔴 ", // Scala's signature red
-	"Groovy":        "🎸 ", // groovy
-	"Clojure":       "🔵 ", // Clojure logo is a blue circle
+	"Java":          "#B07219", // Java orange-brown
+	"Kotlin":        "#A97BFF", // Kotlin purple
+	"Scala":         "#C22D40", // Scala red
+	"Groovy":        "#E69F56",
+	"Clojure":       "#DB5855",
 	// ── JS family ────────────────────────────────────────
-	"JavaScript":    "🟡 ", // JS logo is yellow
-	"TypeScript":    "📘 ", // TypeScript docs / blue branding
-	"CoffeeScript":  "☕ ", // CoffeeScript — coffee
+	"JavaScript":    "#F7DF1E", // JS yellow
+	"TypeScript":    "#3178C6", // TS blue
+	"CoffeeScript":  "#244776",
 	// ── Mobile ───────────────────────────────────────────
-	"Swift":         "🦅 ", // swift bird
-	"Dart":          "🎯 ", // dartboard
-	"Objective-C":   "⚙️  ", // systems / legacy
+	"Swift":         "#F05138", // Swift orange-red
+	"Dart":          "#00B4AB",
+	"Objective-C":   "#438EFF",
 	// ── Functional ───────────────────────────────────────
-	"Haskell":       "λ  ", // lambda — Haskell is pure lambda calculus
-	"Elixir":        "💜 ", // purple — Elixir/Phoenix branding
-	"Erlang":        "📡 ", // telecoms origins
-	"OCaml":         "🐫 ", // camel — OCaml's logo
-	"F#":            "🎵 ", // F# is literally a musical note
+	"Haskell":       "#5E5086",
+	"Elixir":        "#6E4A7E",
+	"Erlang":        "#B83998",
+	"OCaml":         "#3BE133",
+	"F#":            "#B845FC",
+	"Elm":           "#60B5CC",
 	// ── Web ──────────────────────────────────────────────
-	"HTML":          "🌐 ", // globe — web
-	"CSS":           "🎨 ", // palette — styling
-	"SCSS":          "🎨 ",
-	"Sass":          "🎨 ",
-	"Vue":           "💚 ", // Vue's green branding
+	"HTML":          "#E34C26", // HTML orange
+	"CSS":           "#264DE4", // CSS blue
+	"SCSS":          "#C6538C",
+	"Sass":          "#A53B70",
+	"Vue":           "#41B883",
 	// ── Shell ────────────────────────────────────────────
-	"Shell":         "🐚 ", // shell — it is literally a shell
+	"Shell":         "#89E051",
 	// ── Data / Config ────────────────────────────────────
-	"JSON":          "{ } ", // JSON braces
-	"YAML":          "📄 ", // config file
-	"TOML":          "📄 ", // config file
-	"XML":           "📄 ", // markup file
-	"CSV":           "📊 ", // spreadsheet/chart
+	"JSON":          "#A8A8A8",
+	"YAML":          "#F0C44C",
+	"TOML":          "#C6733A",
+	"XML":           "#0060AC",
+	"CSV":           "#A8A8A8",
 	// ── Docs ─────────────────────────────────────────────
-	"Markdown":      "📝 ", // notepad — writing
-	"Text":          "📄 ", // document
-	"LaTeX":         "📐 ", // math / typesetting
+	"Markdown":      "#5BA4CF",
+	"Text":          "#A8A8A8",
+	"LaTeX":         "#3D8B37",
 	// ── DevOps / Build ───────────────────────────────────
-	"Dockerfile":    "🐳 ", // Moby the whale — Docker's mascot
-	"Makefile":      "🔧 ", // wrench — build tool
-	"SQL":           "🗄️  ", // file cabinet — database
-	// ── Git ──────────────────────────────────────────────
-	"Gitignore":     "🚫 ", // no sign — ignoring files
-	"Gitattributes": "⚙️  ", // settings gear
-	// ── Fallback ─────────────────────────────────────────
-	"Unknown":       "📁 ", // generic folder/file
+	"Dockerfile":    "#2496ED", // Docker blue
+	"Makefile":      "#6D9B3A",
+	"SQL":           "#E38C00",
+	"HCL":           "#844FBA",
+	"Terraform":     "#7B42BC",
+	"Protobuf":      "#4285F4",
+	// ── Misc ─────────────────────────────────────────────
+	"Vim Script":    "#199F4B",
+	"Gitignore":     "#F54D27",
+	"Gitattributes": "#F54D27",
+	"Unknown":       "#6B7280",
 }
 
-// iconFor returns the icon prefix for a language given the render mode.
-// Nerd Font mode calls IconForLang (icons.go) which maps via file extension,
-// matching VS Code's Material Icon Theme / vscode-icons coverage.
-// Emoji mode uses the hand-crafted langEmoji map below.
-func iconFor(lang string, use, nerdFont bool) string {
-	if !use {
-		return ""
+// brandColorFor returns the brand hex color for a language, with a neutral fallback.
+func brandColorFor(lang string) string {
+	if c, ok := langBrandColors[lang]; ok {
+		return c
 	}
-	if nerdFont {
-		return IconForLang(lang) + " "
-	}
-	if icon, ok := langEmoji[lang]; ok {
-		return icon
-	}
-	// case-insensitive emoji fallback
 	lower := strings.ToLower(lang)
-	for k, v := range langEmoji {
+	for k, v := range langBrandColors {
 		if strings.ToLower(k) == lower {
 			return v
 		}
 	}
-	return "📁 "
+	return "#6B7280"
+}
+
+// nfIconFor returns the Nerd Font icon prefix when --nf is active; empty otherwise.
+func nfIconFor(lang string, nerdFont bool) string {
+	if !nerdFont {
+		return ""
+	}
+	return IconForLang(lang) + " "
 }
 
 // Render writes the table to w.
@@ -146,8 +152,8 @@ return nil
 maxLangLen := 8 // "Language"
 for _, l := range langs {
 n := len(l.Name)
-if opts.Emoji {
-n += 3
+if opts.NerdFont {
+n += 3 // icon glyph (2 wide) + space
 }
 if n > maxLangLen {
 maxLangLen = n
@@ -177,21 +183,25 @@ lSum := l.Total()
 if totalSum > 0 {
 pct = float64(lSum) / float64(totalSum) * 100
 }
-name := iconFor(l.Name, opts.Emoji, opts.NerdFont) + l.Name
-row := fmt.Sprintf(" %-*s  %6s  %10s",
-maxLangLen, name,
+// Build plain-text name (with optional NF icon) then pad — ANSI codes must NOT
+// be inside the Sprintf format string or byte-width padding breaks alignment.
+plainName := nfIconFor(l.Name, opts.NerdFont) + l.Name
+paddedName := fmt.Sprintf("%-*s", maxLangLen, plainName)
+// Apply brand color to the padded name so numbers stay left-aligned.
+coloredName := termenv.String(paddedName).Foreground(p.p.Color(brandColorFor(l.Name))).Bold().String()
+numPart := fmt.Sprintf("  %6s  %10s",
 humanize.Comma(int64(l.Files)),
 humanize.Comma(l.Code),
 )
-row += fmt.Sprintf("  %10s  %10s",
+numPart += fmt.Sprintf("  %10s  %10s",
 humanize.Comma(l.Comment),
 humanize.Comma(l.Blank),
 )
-row += fmt.Sprintf("  %10s", humanize.Comma(lSum))
+numPart += fmt.Sprintf("  %10s", humanize.Comma(lSum))
 if opts.Pct {
-row += fmt.Sprintf("  %5.1f%%", pct)
+numPart += fmt.Sprintf("  %5.1f%%", pct)
 }
-p.row(l.Name, row)
+p.row(l.Name, " "+coloredName+numPart)
 }
 
 // Total row
@@ -278,23 +288,8 @@ style := termenv.String(s).Bold()
 fmt.Fprintln(p.w, style)
 }
 
-var langColors = []string{
-"#7C3AED", "#2563EB", "#059669", "#D97706", "#DC2626",
-"#0891B2", "#7C3AED", "#BE185D", "#865DFF", "#16A34A",
-}
-
 func (p *printer) row(lang, s string) {
-h := fnv32(lang)
-color := langColors[h%uint32(len(langColors))]
-prefix := termenv.String("▌").Foreground(p.p.Color(color))
-fmt.Fprintln(p.w, prefix.String()+s)
-}
-
-func fnv32(s string) uint32 {
-var h uint32 = 2166136261
-for i := 0; i < len(s); i++ {
-h ^= uint32(s[i])
-h *= 16777619
-}
-return h
+	color := brandColorFor(lang)
+	prefix := termenv.String("▌").Foreground(p.p.Color(color))
+	fmt.Fprintln(p.w, prefix.String()+s)
 }

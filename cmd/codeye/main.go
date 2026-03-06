@@ -58,7 +58,6 @@ wide            bool
 compact         bool
 pct             bool
 progress        bool
-emoji           bool
 nerdFont        bool
 theme           string
 history         bool
@@ -131,8 +130,7 @@ cmd.Flags().BoolVarP(&f.wide, "wide", "w", false, "show blank/comment columns")
 cmd.Flags().BoolVar(&f.compact, "compact", false, "single-line summary")
 	cmd.Flags().BoolVar(&f.pct, "pct", true, "show percentage column")
 	cmd.Flags().BoolVar(&f.progress, "progress", false, "show live progress bar")
-	cmd.Flags().BoolVar(&f.emoji, "emoji", true, "language emoji icons")
-    cmd.Flags().BoolVar(&f.nerdFont, "nf", false, "use Nerd Font glyphs (requires a patched font: JetBrainsMono NF, FiraCode NF, etc.)")
+	cmd.Flags().BoolVar(&f.nerdFont, "nf", false, "use Nerd Font glyphs (requires a patched font: JetBrainsMono NF, FiraCode NF, etc.)")
 	cmd.Flags().StringVar(&f.theme, "theme", "dark", "color theme: dark|light|mono")
 // Analysis
 cmd.Flags().BoolVarP(&f.history, "history", "H", false, "LoC growth over git history")
@@ -176,7 +174,6 @@ cfg.Wide = f.wide
 cfg.Compact = f.compact
 cfg.Pct = f.pct
 cfg.Progress = f.progress
-cfg.Emoji = f.emoji
 	// NerdFont: don't override here — RunE applies cmd.Flags().Changed("nf") for explicit flag handling.
 cfg.Theme = f.theme
 cfg.History = f.history
@@ -336,7 +333,6 @@ NoHeader: cfg.NoHeader,
 Wide:     cfg.Wide,
 Compact:  cfg.Compact,
 Pct:      cfg.Pct,
-Emoji:    cfg.Emoji,
 NerdFont: cfg.NerdFont,
 Theme:    cfg.Theme,
 Top:      cfg.Top,
