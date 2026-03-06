@@ -337,16 +337,48 @@ func parseNumstat(out string) []LogEntry {
 
 func parseBlame(out string) map[string]int64 {
 	counts := make(map[string]int64)
-	var currentEmail string
-	for _, line := range strings.Split(out, "\n") {
-		if strings.HasPrefix(line, "author-mail ") {
-			email := strings.TrimPrefix(line, "author-mail ")
-			email = strings.Trim(email, "<>")
-			currentEmail = email
-		} else if strings.HasPrefix(line, "\t") {
-			// Tab-prefixed line = actual code line
-			if currentEmail != "" {
-				counts[currentEmail]++
+	emailMap := make(map[string]string) // hash -> email
+
+	lines := strings.Split(out, "\n")
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		if line == "" {
+			continue
+		}
+
+		// A line starting with a tab is a code line.
+		if strings.HasPrefix(line, "\t") {
+			// This shouldn't happen before we see a commit info line,
+			// but we'll handle it by just skipping.
+			continue
+		}
+
+		parts := strings.Fields(line)
+		if len(parts) >= 4 && len(parts[0]) >= 7 {
+			// This is likely a commit info line: <sha> <src> <dst> <n>
+			hash := parts[0]
+			email, ok := emailMap[hash]
+
+			// Scan forward for metadata (author-mail) and then the tabbed code line
+			for j := i + 1; j < len(lines); j++ {
+				inner := lines[j]
+				if strings.HasPrefix(inner, "author-mail ") && !ok {
+					email = strings.TrimPrefix(inner, "author-mail ")
+					email = strings.TrimSpace(strings.Trim(email, "<>"))
+					emailMap[hash] = email
+					ok = true
+				} else if strings.HasPrefix(inner, "\t") {
+					// Found the code line for this commit block
+					if ok && email != "" {
+						counts[email]++
+					}
+					i = j // Advance main loop
+					break
+				} else if len(inner) > 40 && !strings.Contains(inner[:8], " ") {
+					// Hit next commit block without finding tab? (Shouldn't happen in porcelain)
+					i = j - 1
+					break
+				}
 			}
 		}
 	}
