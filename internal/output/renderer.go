@@ -42,6 +42,10 @@ func Get(format string) Renderer {
 		return &CSVRenderer{}
 	case "badge":
 		return &BadgeRenderer{}
+	case "markdown":
+		return &MarkdownRenderer{}
+	case "compact":
+		return &CompactRenderer{}
 	default:
 		return &TableRenderer{}
 	}
@@ -49,5 +53,5 @@ func Get(format string) Renderer {
 
 // ValidFormats lists all valid --format values.
 var ValidFormats = []string{
-	"table", "bar", "spark", "json", "ndjson", "csv", "badge",
+	"table", "bar", "spark", "json", "ndjson", "csv", "badge", "markdown", "compact",
 }
