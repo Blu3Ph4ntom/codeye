@@ -1,0 +1,167 @@
+version: 2
+
+project_name: codeye
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: codeye
+    main: ./cmd/codeye
+    binary: codeye
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.buildDate={{.Date}}
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
+      - goos: freebsd
+        goarch: "386"
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  abbrev: 0
+  groups:
+    - title: "Features"
+      regexp: '^feat(\(.+\))?!?:.+'
+      order: 0
+    - title: "Bug Fixes"
+      regexp: '^fix(\(.+\))?!?:.+'
+      order: 1
+    - title: "Performance"
+      regexp: '^perf(\(.+\))?!?:.+'
+      order: 2
+    - title: "Other"
+      order: 999
+  filters:
+    exclude:
+      - "^chore:"
+      - "^docs:"
+      - "^ci:"
+      - "Merge pull request"
+      - "Merge branch"
+
+release:
+  github:
+    owner: codeye
+    name: codeye
+  name_template: "v{{ .Version }}"
+  footer: |
+    ## Install
+
+    **Homebrew:**
+    ```
+    brew install codeye/tap/codeye
+    ```
+
+    **Direct download:**
+    ```
+    curl -sSfL https://raw.githubusercontent.com/codeye/codeye/main/install.sh | sh
+    ```
+
+    **Go install:**
+    ```
+    go install github.com/codeye/codeye/cmd/codeye@latest
+    ```
+
+brews:
+  - name: codeye
+    repository:
+      owner: codeye
+      name: homebrew-tap
+    directory: Formula
+    homepage: "https://github.com/codeye/codeye"
+    description: "Fast lines-of-code scanner for git repositories"
+    license: "MIT"
+    test: |
+      system "#{bin}/codeye", "--version"
+    install: |
+      bin.install "codeye"
+      bash_completion.install "completions/codeye.bash" => "codeye"
+      zsh_completion.install "completions/_codeye" => "_codeye"
+      fish_completion.install "completions/codeye.fish"
+
+nfpms:
+  - id: packages
+    package_name: codeye
+    formats:
+      - deb
+      - rpm
+      - apk
+    vendor: codeye
+    homepage: https://github.com/codeye/codeye
+    maintainer: "codeye <hello@codeye.dev>"
+    description: "Fast lines-of-code scanner for git repositories"
+    license: MIT
+    bindir: /usr/bin
+    contents:
+      - src: ./completions/codeye.bash
+        dst: /usr/share/bash-completion/completions/codeye
+      - src: ./completions/_codeye
+        dst: /usr/share/zsh/vendor-completions/_codeye
+      - src: ./completions/codeye.fish
+        dst: /usr/share/fish/completions/codeye.fish
+
+sboms:
+  - artifacts: archive
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - --output-certificate=${certificate}
+      - --output-signature=${signature}
+      - ${artifact}
+      - --yes
+    artifacts: checksum
+    output: true
