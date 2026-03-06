@@ -290,7 +290,8 @@ func parseNumstat(out string) []LogEntry {
 	var entries []LogEntry
 	var current *LogEntry
 
-	for _, line := range strings.Split(out, "\n") {
+	lines := strings.Split(out, "\n")
+	for _, line := range lines {
 		if strings.HasPrefix(line, "COMMIT ") {
 			if current != nil {
 				entries = append(entries, *current)
@@ -301,12 +302,7 @@ func parseNumstat(out string) []LogEntry {
 				current.Hash = parts[0]
 			}
 			if len(parts) >= 2 {
-				// May have author name+ email
-				nameEmail := parts[1]
-				current.Author, current.Email = parseNameEmail(nameEmail)
-				if current.Author == "" {
-					current.Email = nameEmail
-				}
+				current.Email = parts[1]
 			}
 			if len(parts) >= 3 {
 				current.Date = parts[2]
@@ -320,11 +316,16 @@ func parseNumstat(out string) []LogEntry {
 			continue
 		}
 		// numstat lines: "added\tdeleted\tfile"
+		// or "-\t-\tfile" for binary
 		parts := strings.SplitN(line, "\t", 3)
 		if len(parts) == 3 {
 			var added, deleted int64
-			fmt.Sscanf(parts[0], "%d", &added)
-			fmt.Sscanf(parts[1], "%d", &deleted)
+			if parts[0] != "-" {
+				fmt.Sscanf(parts[0], "%d", &added)
+			}
+			if parts[1] != "-" {
+				fmt.Sscanf(parts[1], "%d", &deleted)
+			}
 			current.Added += added
 			current.Deleted += deleted
 		}
