@@ -4,6 +4,9 @@
 # build output
 /codeye
 /codeye.exe
+web/public/
+web/resources/
+web/.hugo_build.lock
 dist/
 
 # Go

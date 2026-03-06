@@ -1,0 +1,11 @@
+{{ define "main" }}
+    <article>
+        <h1>{{ .Title }}</h1>
+        <p style="color: var(--muted); border-bottom: 1px solid rgba(128,128,128,0.1); padding-bottom: 20px;">
+            {{ .Date.Format "Jan 02, 2006" }} · Reading time: {{ .ReadingTime }} min
+        </p>
+        <div class="content">
+            {{ .Content }}
+        </div>
+    </article>
+{{ end }}

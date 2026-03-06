@@ -11,8 +11,15 @@ LDFLAGS   := -s -w \
 	-X main.commit=$(COMMIT) \
 	-X main.buildDate=$(DATE)
 
-GO        := go
-GOFLAGS   := CGO_ENABLED=0
+
+# Resolve Go binary from common install locations (user GOPATH, /usr/local/go, system PATH)
+GO_CANDIDATES := $(HOME)/go/bin/go /usr/local/go/bin/go /usr/bin/go go
+GO            := $(or $(shell for g in $(GO_CANDIDATES); do command -v $$g 2>/dev/null && break; done), go)
+GOFLAGS       := CGO_ENABLED=0
+
+HUGO          := hugo
+WEB_DIR       := web
+WEB_CONFIG    := $(WEB_DIR)/config.toml
 
 # ─── Build ────────────────────────────────────────────────────────────────────
 
@@ -97,6 +104,21 @@ release:
 clean:
 	rm -f $(BINARY) coverage.out coverage.html
 	rm -rf dist/
+
+# ─── Website ─────────────────────────────────────────────────────────────────
+
+.PHONY: web
+web:
+	cd $(WEB_DIR) && $(HUGO) --config config.toml
+
+.PHONY: web-serve
+web-serve:
+	cd $(WEB_DIR) && $(HUGO) server --config config.toml --port 1313 --bind 127.0.0.1
+
+.PHONY: web-clean
+web-clean:
+	rm -rf $(WEB_DIR)/public $(WEB_DIR)/resources
+
 
 .PHONY: tidy
 tidy:
