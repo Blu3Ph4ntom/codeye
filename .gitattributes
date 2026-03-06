@@ -1,0 +1,23 @@
+# Linguist overrides to make GitHub show 100% Go for the whole repo
+# We treat everything except internal Go code as generated or data
+
+# Ignore website (it's not part of the core tool)
+web/* linguist-documentation
+web/themes/* linguist-vendored
+
+# Ignore test data and mocks
+testdata/* linguist-vendored
+*_test.go linguist-documentation
+
+# Ignore config and build shits
+*.toml linguist-generated
+*.yaml linguist-generated
+*.yml linguist-generated
+Makefile linguist-generated
+install.sh linguist-generated
+.goreleaser.yaml linguist-generated
+.golangci.yml linguist-generated
+
+# Explicitly mark internal Go packages as the primary source
+internal/**/*.go linguist-detectable
+cmd/**/*.go linguist-detectable
