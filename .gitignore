@@ -2,8 +2,8 @@
 .agent/
 
 # build output
-codeye
-codeye.exe
+/codeye
+/codeye.exe
 dist/
 
 # Go

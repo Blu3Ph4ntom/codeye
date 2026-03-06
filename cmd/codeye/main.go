@@ -59,6 +59,7 @@ compact         bool
 pct             bool
 progress        bool
 emoji           bool
+nerdFont        bool
 theme           string
 history         bool
 historyInterval string
@@ -125,7 +126,8 @@ cmd.Flags().BoolVar(&f.compact, "compact", false, "single-line summary")
 	cmd.Flags().BoolVar(&f.pct, "pct", true, "show percentage column")
 	cmd.Flags().BoolVar(&f.progress, "progress", false, "show live progress bar")
 	cmd.Flags().BoolVar(&f.emoji, "emoji", true, "language emoji icons")
-cmd.Flags().StringVar(&f.theme, "theme", "dark", "color theme: dark|light|mono")
+	cmd.Flags().BoolVar(&f.nerdFont, "nf", false, "Nerd Font glyphs instead of emoji (requires patched terminal font)")
+	cmd.Flags().StringVar(&f.theme, "theme", "dark", "color theme: dark|light|mono")
 // Analysis
 cmd.Flags().BoolVarP(&f.history, "history", "H", false, "LoC growth over git history")
 cmd.Flags().StringVar(&f.historyInterval, "history-interval", "week", "day|week|month|quarter|year")
@@ -169,6 +171,7 @@ cfg.Compact = f.compact
 cfg.Pct = f.pct
 cfg.Progress = f.progress
 cfg.Emoji = f.emoji
+cfg.NerdFont = f.nerdFont || cfg.NerdFont // also respect env var from DefaultConfig
 cfg.Theme = f.theme
 cfg.History = f.history
 cfg.HistoryInterval = f.historyInterval
@@ -328,6 +331,7 @@ Wide:     cfg.Wide,
 Compact:  cfg.Compact,
 Pct:      cfg.Pct,
 Emoji:    cfg.Emoji,
+NerdFont: cfg.NerdFont,
 Theme:    cfg.Theme,
 Top:      cfg.Top,
 Sort:     cfg.Sort,

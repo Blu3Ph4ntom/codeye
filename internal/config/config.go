@@ -37,9 +37,10 @@ type Config struct {
 	Wide     bool
 	Compact  bool
 	Pct      bool
-	Progress bool
-	Emoji    bool
-	Theme    string
+	Progress  bool
+	Emoji     bool
+	NerdFont  bool // use Nerd Font terminal glyphs (requires patched font)
+	Theme     string
 
 	// Analysis modes
 	History         bool
@@ -75,6 +76,7 @@ func DefaultConfig() *Config {
 		Sort:            "lines",
 		Top:             0, // 0 = show all
 		Theme:           "dark",
+		NerdFont:        os.Getenv("CODEYE_NERD_FONTS") == "1" || os.Getenv("NERD_FONTS") == "1",
 		HistoryInterval: "week",
 		HistoryLimit:    500,
 		Workers:         runtime.GOMAXPROCS(0),

@@ -13,53 +13,104 @@ import (
 // TableRenderer renders scan results as a formatted table.
 type TableRenderer struct{}
 
-var langEmoji = map[string]string{
-"Gitignore":     "🙈",
-"Gitattributes": "🔧",
-"Text":          "📄",
-"TOML":          "⚙️",
-"JSON":          "📦",
-"YAML":          "⚙️",
-"Makefile":      "🔨",
-"Dockerfile":    "🐳",
-"Go":            "🐹",
-"Rust":          "🦀",
-"Python":        "🐍",
-"JavaScript":    "🟨",
-"TypeScript":    "🔷",
-"Ruby":          "💎",
-"Java":          "☕",
-"Kotlin":        "🟣",
-"Swift":         "🧡",
-"C":             "🔵",
-"C++":           "🔵",
-"C#":            "🟢",
-"PHP":           "🐘",
-"Shell":         "🐚",
-"HTML":          "🌐",
-"CSS":           "🎨",
-"Markdown":      "📝",
-"SQL":           "🗄️",
-"Dart":          "🎯",
-"Scala":         "🔴",
-"Elixir":        "💜",
-"Haskell":       "🟤",
-"Unknown":       "❓",
+// langNerdIcons maps language names to Nerd Font glyph + space.
+// These are Devicons / Font Awesome codepoints from the Nerd Fonts PUA range.
+// Requires a Nerd Font patched font in the terminal (e.g. JetBrainsMono Nerd Font,
+// FiraCode Nerd Font). Enable with --nf or CODEYE_NERD_FONTS=1.
+var langNerdIcons = map[string]string{
+	"Go":             "\ue627 ", // devicons Go
+	"Python":         "\ue73c ", // devicons Python
+	"Rust":           "\ue7a8 ", // devicons Rust
+	"JavaScript":     "\ue74e ", // devicons JavaScript
+	"TypeScript":     "\ue628 ", // devicons TypeScript
+	"Ruby":           "\ue739 ", // devicons Ruby
+	"Java":           "\ue738 ", // devicons Java
+	"Kotlin":         "\ue70e ", // devicons Kotlin
+	"Swift":          "\ue755 ", // devicons Swift
+	"PHP":            "\ue73d ", // devicons PHP
+	"C":              "\ue61e ", // devicons C
+	"C++":            "\ue61d ", // devicons C++
+	"C#":             "\uf031b ", // nf-md C#
+	"Elixir":         "\ue62d ", // devicons Elixir
+	"Haskell":        "\ue61f ", // devicons Haskell (λ)
+	"Scala":          "\ue737 ", // devicons Scala
+	"Dart":           "\ue798 ", // devicons Dart
+	"HTML":           "\ue736 ", // devicons HTML5
+	"CSS":            "\ue749 ", // devicons CSS3
+	"Shell":          "\ue691 ", // devicons Terminal/Bash
+	"Markdown":       "\ue73e ", // devicons Markdown
+	"YAML":           "\ue6d2 ", // devicons YAML / config
+	"TOML":           "\uf4d3 ", // nf-md file-cog
+	"JSON":           "\ue60b ", // devicons JSON
+	"Dockerfile":     "\uf308 ", // nf-dev Docker (whale)
+	"Makefile":       "\ue779 ", // devicons Makefile / CMake
+	"SQL":            "\uf1c0 ", // fa-database
+	"Gitignore":      "\ue725 ", // devicons Git
+	"Gitattributes":  "\ue725 ", // devicons Git
+	"Text":           "\uf15c ", // fa-file-text
+	"Unknown":        "\uf15b ", // fa-file
 }
 
-func emojiFor(lang string, use bool) string {
-if !use {
-return ""
+// langEmoji maps language names to emoji icons.
+// These work on any modern terminal without special fonts.
+var langEmoji = map[string]string{
+	"Go":             "󰟓 ", // recognisable Go gopher → fallback 🐹
+	"Python":         "🐍 ",
+	"Rust":           "🦀 ",
+	"JavaScript":     "🟡 ",
+	"TypeScript":     "🔵 ",
+	"Ruby":           "💎 ",
+	"Java":           "☕ ",
+	"Kotlin":         "🟪 ",
+	"Swift":          "🟠 ",
+	"PHP":            "🐘 ",
+	"C":              "🔵 ",
+	"C++":            "🔷 ",
+	"C#":             "💚 ",
+	"Elixir":         "💜 ",
+	"Haskell":        "🟤 ",
+	"Scala":          "🔴 ",
+	"Dart":           "🎯 ",
+	"HTML":           "🌐 ",
+	"CSS":            "🎨 ",
+	"Shell":          "💲 ",
+	"Markdown":       "📝 ",
+	"YAML":           "📋 ",
+	"TOML":           "📋 ",
+	"JSON":           "📦 ",
+	"Dockerfile":     "🐳 ",
+	"Makefile":       "🔨 ",
+	"SQL":            "🗄️ ",
+	"Gitignore":      "🚫 ",
+	"Gitattributes":  "⚙️ ",
+	"Text":           "📄 ",
+	"Unknown":        "❓ ",
 }
-if e, ok := langEmoji[lang]; ok {
-return e + " "
-}
-for k, v := range langEmoji {
-if strings.EqualFold(k, lang) {
-return v + " "
-}
-}
-return "   "
+
+// iconFor returns the icon prefix for a language given the render mode.
+// If nerdFont=true, uses Nerd Font glyphs; otherwise emoji; if !use, empty string.
+func iconFor(lang string, use, nerdFont bool) string {
+	if !use {
+		return ""
+	}
+	iconMap := langEmoji
+	if nerdFont {
+		iconMap = langNerdIcons
+	}
+	if icon, ok := iconMap[lang]; ok {
+		return icon
+	}
+	// case-insensitive fallback
+	lower := strings.ToLower(lang)
+	for k, v := range iconMap {
+		if strings.ToLower(k) == lower {
+			return v
+		}
+	}
+	if nerdFont {
+		return "\uf15b " // fa-file generic
+	}
+	return "❓ "
 }
 
 // Render writes the table to w.
@@ -136,7 +187,7 @@ lSum := l.Total()
 if totalSum > 0 {
 pct = float64(lSum) / float64(totalSum) * 100
 }
-name := emojiFor(l.Name, opts.Emoji) + l.Name
+name := iconFor(l.Name, opts.Emoji, opts.NerdFont) + l.Name
 row := fmt.Sprintf(" %-*s  %6s  %10s",
 maxLangLen, name,
 humanize.Comma(int64(l.Files)),
