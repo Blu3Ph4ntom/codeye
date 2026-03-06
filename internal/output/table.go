@@ -13,76 +13,6 @@ import (
 // TableRenderer renders scan results as a formatted table.
 type TableRenderer struct{}
 
-// langNerdIcons maps language names to Nerd Font v3 glyph + trailing space.
-//
-// Codepoints come from the Devicons (nf-dev-*), seti-ui (nf-seti-*),
-// and Material Design (nf-md-*) subsets bundled in Nerd Fonts v3.
-// These are the same icons VS Code extensions like "vscode-icons" and
-// "Material Icon Theme" display for each file type.
-// Enable with --nf flag or CODEYE_NERD_FONTS=1 env var.
-var langNerdIcons = map[string]string{
-	// ── Systems ──────────────────────────────────────────
-	"Go":            "\ue627 ", // nf-dev-go
-	"Rust":          "\ue7a8 ", // nf-seti-rust
-	"C":             "\ue61e ", // nf-custom-c
-	"C++":           "\ue61d ", // nf-custom-cpp
-	"C#":            "\uf031b ", // nf-md-language_csharp
-	"Zig":           "\ue6a9 ", // nf-seti-zig
-	// ── Scripted ─────────────────────────────────────────
-	"Python":        "\ue73c ", // nf-dev-python
-	"Ruby":          "\ue739 ", // nf-dev-ruby
-	"PHP":           "\ue73d ", // nf-dev-php
-	"Perl":          "\ue769 ", // nf-dev-perl
-	"Lua":           "\ue620 ", // nf-seti-lua
-	// ── JVM ──────────────────────────────────────────────
-	"Java":          "\ue738 ", // nf-dev-java
-	"Kotlin":        "\ue70e ", // nf-seti-kotlin
-	"Scala":         "\ue737 ", // nf-dev-scala
-	"Groovy":        "\ue775 ", // nf-dev-groovy
-	"Clojure":       "\ue76a ", // nf-dev-clojure
-	// ── Typed JS family ──────────────────────────────────
-	"JavaScript":    "\ue74e ", // nf-dev-javascript
-	"TypeScript":    "\ue628 ", // nf-seti-typescript
-	"CoffeeScript":  "\ue751 ", // nf-dev-coffeescript
-	// ── Mobile ───────────────────────────────────────────
-	"Swift":         "\ue755 ", // nf-dev-swift
-	"Dart":          "\ue798 ", // nf-dev-dart
-	"Objective-C":   "\ue61e ", // nf-custom-c (ObjC uses C icon)
-	// ── Functional ───────────────────────────────────────
-	"Haskell":       "\ue61f ", // nf-dev-haskell
-	"Elixir":        "\ue62d ", // nf-dev-elixir
-	"Erlang":        "\ue7b1 ", // nf-dev-erlang
-	"OCaml":         "\ue67a ", // nf-seti-ocaml
-	"F#":            "\ue7a7 ", // nf-dev-fsharp
-	// ── Web ──────────────────────────────────────────────
-	"HTML":          "\ue736 ", // nf-dev-html5
-	"CSS":           "\ue749 ", // nf-dev-css3
-	"SCSS":          "\ue749 ", // nf-dev-css3
-	"Sass":          "\ue74b ", // nf-dev-sass
-	"Vue":           "\ue6a0 ", // nf-dev-vue
-	// ── Shell ────────────────────────────────────────────
-	"Shell":         "\ue691 ", // nf-dev-terminal (bash)
-	// ── Data / Config ────────────────────────────────────
-	"JSON":          "\ue60b ", // nf-seti-json
-	"YAML":          "\ue6d2 ", // nf-seti-yaml
-	"TOML":          "\ue6b2 ", // nf-seti-config (gear)
-	"XML":           "\ue619 ", // nf-seti-xml
-	"CSV":           "\uf1c3 ", // nf-fa-file_excel_o
-	// ── Docs ─────────────────────────────────────────────
-	"Markdown":      "\ue73e ", // nf-dev-markdown
-	"Text":          "\uf15c ", // nf-fa-file_text_o
-	"LaTeX":         "\ue612 ", // nf-seti-latex
-	// ── DevOps / Build ───────────────────────────────────
-	"Dockerfile":    "\uf308 ", // nf-dev-docker
-	"Makefile":      "\ue779 ", // nf-dev-cmake
-	"SQL":           "\uf1c0 ", // nf-fa-database
-	// ── Git ──────────────────────────────────────────────
-	"Gitignore":     "\ue725 ", // nf-dev-git
-	"Gitattributes": "\ue725 ", // nf-dev-git
-	// ── Fallback ─────────────────────────────────────────
-	"Unknown":       "\uf15b ", // nf-fa-file
-}
-
 // langEmoji maps language names to emoji icons.
 // These are plain Unicode emoji — no special fonts required.
 // Chosen to have a real semantic connection to the language or ecosystem.
@@ -150,29 +80,27 @@ var langEmoji = map[string]string{
 }
 
 // iconFor returns the icon prefix for a language given the render mode.
-// If nerdFont=true, uses Nerd Font glyphs; otherwise emoji; if !use, empty string.
+// Nerd Font mode calls IconForLang (icons.go) which maps via file extension,
+// matching VS Code's Material Icon Theme / vscode-icons coverage.
+// Emoji mode uses the hand-crafted langEmoji map below.
 func iconFor(lang string, use, nerdFont bool) string {
 	if !use {
 		return ""
 	}
-	iconMap := langEmoji
 	if nerdFont {
-		iconMap = langNerdIcons
+		return IconForLang(lang) + " "
 	}
-	if icon, ok := iconMap[lang]; ok {
+	if icon, ok := langEmoji[lang]; ok {
 		return icon
 	}
-	// case-insensitive fallback
+	// case-insensitive emoji fallback
 	lower := strings.ToLower(lang)
-	for k, v := range iconMap {
+	for k, v := range langEmoji {
 		if strings.ToLower(k) == lower {
 			return v
 		}
 	}
-	if nerdFont {
-		return "\uf15b " // fa-file generic
-	}
-	return "❓ "
+	return "📁 "
 }
 
 // Render writes the table to w.
