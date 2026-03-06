@@ -253,6 +253,7 @@ var langDefs = map[string]LangDef{
 		BlockStart: []string{"/*"}, BlockEnd: []string{"*/"}},
 	"Assembly": {Name: "Assembly", LineComment: []string{";", "#"}},
 	"HCL":      {Name: "HCL", LineComment: []string{"#", "//"}},
+	"Gitignore": {Name: "Gitignore", LineComment: []string{"#"}},
 }
 
 // shebangs maps shebang interpreter patterns to language names.
