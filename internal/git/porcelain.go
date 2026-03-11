@@ -353,12 +353,13 @@ func parseNumstat(out string) []LogEntry {
 // parseBlame correctly parses git blame --porcelain output.
 //
 // Porcelain format per line:
-//   HASH orig_line final_line [num_lines]    <- commit header (num_lines only on first occurrence)
-//   author NAME                              <- metadata (only on first occurrence of hash)
-//   author-mail <EMAIL>
-//   ... more metadata ...
-//   filename FILE
-//   \tSOURCE LINE                            <- always present, exactly one per commit header
+//
+//	HASH orig_line final_line [num_lines]    <- commit header (num_lines only on first occurrence)
+//	author NAME                              <- metadata (only on first occurrence of hash)
+//	author-mail <EMAIL>
+//	... more metadata ...
+//	filename FILE
+//	\tSOURCE LINE                            <- always present, exactly one per commit header
 //
 // Bug in previous version: subsequent commit headers have only 3 parts (no num_lines),
 // so len(parts) >= 4 was false and those lines were skipped — causing a massive undercount.
