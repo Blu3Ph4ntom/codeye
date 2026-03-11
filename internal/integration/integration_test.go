@@ -170,13 +170,67 @@ func TestTopN(t *testing.T) {
 
 	out := run(t, root, bin, "--format=json", "--top=1", ".")
 	var result struct {
-		Languages []struct{ Name string `json:"language"` } `json:"languages"`
+		Languages []struct {
+			Name string `json:"language"`
+		} `json:"languages"`
 	}
 	if err := json.Unmarshal([]byte(out), &result); err != nil {
 		t.Fatalf("invalid JSON: %v", err)
 	}
 	if len(result.Languages) != 1 {
 		t.Errorf("expected 1 language with --top=1, got %d", len(result.Languages))
+	}
+}
+
+func TestLangCSVFilter(t *testing.T) {
+	requireGit(t)
+	bin := binaryPath(t)
+	root := repoRoot(t)
+
+	out := run(t, root, bin, "--format=json", "--lang=Go,Markdown", ".")
+	var result struct {
+		Languages []struct {
+			Name string `json:"name"`
+		} `json:"languages"`
+	}
+	if err := json.Unmarshal([]byte(out), &result); err != nil {
+		t.Fatalf("invalid JSON: %v", err)
+	}
+	if len(result.Languages) != 2 {
+		t.Fatalf("expected 2 filtered languages, got %d", len(result.Languages))
+	}
+	names := map[string]bool{}
+	for _, lang := range result.Languages {
+		names[lang.Name] = true
+	}
+	if !names["Go"] || !names["Markdown"] {
+		t.Fatalf("unexpected filtered languages: %#v", result.Languages)
+	}
+}
+
+func TestConfigFileApplied(t *testing.T) {
+	requireGit(t)
+	bin := binaryPath(t)
+	root := repoRoot(t)
+
+	configDir := t.TempDir()
+	configPath := filepath.Join(configDir, ".codeye.toml")
+	configBody := "format = \"json\"\nlang = [\"Go\"]\nno_color = true\n"
+	if err := os.WriteFile(configPath, []byte(configBody), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	out := run(t, root, bin, "--config", configPath, ".")
+	var result struct {
+		Languages []struct {
+			Name string `json:"name"`
+		} `json:"languages"`
+	}
+	if err := json.Unmarshal([]byte(out), &result); err != nil {
+		t.Fatalf("invalid JSON: %v\noutput: %s", err, out)
+	}
+	if len(result.Languages) != 1 || result.Languages[0].Name != "Go" {
+		t.Fatalf("unexpected languages from config filter: %#v", result.Languages)
 	}
 }
 

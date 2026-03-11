@@ -1,13 +1,14 @@
-baseURL = "https://codeye.dev/"
+baseURL = "https://codeye.bluephantom.dev/"
 languageCode = "en-us"
 title = "codeye"
 theme = "codeye"
 enableRobotsTXT = true
 
 [params]
-  tagline   = "Eyes on your code, instantly."
-  subtitle  = "Sub-100ms lines-of-code scanner for git repos. Blame, history, hotspots — single static binary, zero config."
+  tagline   = "Fast repository intelligence from a single binary."
+  subtitle  = "Track lines of code, ownership, history, and churn across git repositories without slow indexing or heavyweight setup."
   version   = "v0.1.0"
+  domain    = "codeye.bluephantom.dev"
   githubURL = "https://github.com/blu3ph4ntom/codeye"
 
 [menu]

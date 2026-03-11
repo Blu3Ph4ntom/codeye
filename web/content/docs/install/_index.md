@@ -1,59 +1,66 @@
 ---
 title: "Install"
-description: "Install codeye on macOS, Linux, or Windows."
+description: "Install codeye on Linux, macOS, or Windows."
 ---
 
 # Install
 
-codeye ships as a single static binary — no runtime, no CGO, no dependencies.
+`codeye` ships as a single static binary. You need `git` on your `PATH`; nothing else is required at runtime.
 
 ## Go install
 
-The quickest way if you have Go 1.22+:
+Best for developers already using Go 1.22+:
 
 ```bash
 go install github.com/blu3ph4ntom/codeye/cmd/codeye@latest
 ```
 
-The binary lands in `$GOPATH/bin` (usually `~/go/bin`). Make sure that's on your `$PATH`.
+The binary is installed into your Go bin directory, usually `~/go/bin` on Unix-like systems.
 
-## Pre-built binaries
+## Hosted install scripts
 
-Download from the [Releases page](https://github.com/blu3ph4ntom/codeye/releases):
-
-| Platform | File |
-|----------|------|
-| Linux x86-64 | `codeye_linux_amd64.tar.gz` |
-| Linux arm64  | `codeye_linux_arm64.tar.gz` |
-| macOS x86-64 | `codeye_darwin_amd64.tar.gz` |
-| macOS arm64  | `codeye_darwin_arm64.tar.gz` |
-| Windows x86-64 | `codeye_windows_amd64.zip` |
-
-Extract and put the binary somewhere on your `PATH`.
-
-## Homebrew (macOS/Linux)
+The GitHub Pages site hosts the same installer scripts tracked in the repository:
 
 ```bash
-brew install codeye/tap/codeye
+# Linux / macOS
+curl -sSfL https://codeye.bluephantom.dev/install.sh | sh
 ```
+
+```powershell
+# Windows PowerShell
+iex (irm https://codeye.bluephantom.dev/install.ps1)
+```
+
+## Release archives
+
+Prebuilt binaries are published on the [GitHub releases page](https://github.com/blu3ph4ntom/codeye/releases).
+
+Current archive names follow this pattern:
+
+| Platform | Example archive |
+|----------|-----------------|
+| Linux amd64 | `codeye_0.1.0_linux_amd64.tar.gz` |
+| Linux arm64 | `codeye_0.1.0_linux_arm64.tar.gz` |
+| macOS amd64 | `codeye_0.1.0_darwin_amd64.tar.gz` |
+| macOS arm64 | `codeye_0.1.0_darwin_arm64.tar.gz` |
+| Windows amd64 | `codeye_0.1.0_windows_amd64.zip` |
+
+Extract the archive and move `codeye` or `codeye.exe` onto your `PATH`.
 
 ## Verify
 
 ```bash
-codeye --version
-# codeye v0.1.0 (abc1234)
+codeye version
+codeye doctor
 ```
 
-## Requirements
+`codeye doctor` checks for the git binary, the current repo context, and the cache directory.
 
-- `git` must be available on `PATH` (any version ≥ 2.0)
-- No other runtime dependencies
-
-## Shell completions
+## Shell completion
 
 ```bash
 # bash
-codeye completion bash > /etc/bash_completion.d/codeye
+codeye completion bash > ~/.bash_completion.d/codeye
 
 # zsh
 codeye completion zsh > "${fpath[1]}/_codeye"

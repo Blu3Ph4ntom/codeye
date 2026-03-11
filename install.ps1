@@ -1,5 +1,5 @@
 # install.ps1 — one-line installer for codeye on Windows
-# Usage: iex (irm https://raw.githubusercontent.com/blu3ph4ntom/codeye/main/install.ps1)
+# Usage: iex (irm https://codeye.bluephantom.dev/install.ps1)
 
 $ErrorActionPreference = 'Stop'
 

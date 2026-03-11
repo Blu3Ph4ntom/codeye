@@ -1,122 +1,75 @@
 ---
 title: "Output Formats"
-description: "All output formats supported by codeye."
+description: "Structured and terminal-friendly output formats supported by codeye."
 ---
 
 # Output Formats
 
-Select a format with `--format <name>` or `CODEYE_FORMAT=<name>`.
+Select a format with `--format <name>`.
 
-## table (default)
+## Terminal formats
 
-Human-readable, colour-coded terminal table with per-language breakdown:
+| Format | Purpose |
+|--------|---------|
+| `table` | Default human-readable summary |
+| `bar` | Horizontal language bars |
+| `spark` | Sparkline-focused output |
+| `compact` | Single-line summary for prompts or status bars |
+| `markdown` | GitHub-friendly table output |
 
-```
-codeye · main · 45 files · 11ms
-──────────────────────────────────────────────────────────────────
-  Language           Files      Code  Comments    Blanks     Total      %
-──────────────────────────────────────────────────────────────────
-▌ Go                    28     3,733       272       441     4,446  77.0%
-▌ TypeScript            12     2,104       188       310     2,602  16.1%
-▌ Markdown               4       433         0       126       559   3.5%
-▌ Shell                  1        56         3        14        73   0.5%
-──────────────────────────────────────────────────────────────────
-  Total                 45     6,326       463       891     7,680 100.0%
-```
+## Structured formats
 
-## compact
+| Format | Purpose |
+|--------|---------|
+| `json` | Full structured payload |
+| `ndjson` | One JSON object per line |
+| `csv` | Spreadsheet and reporting workflows |
+| `badge` | Shields.io endpoint JSON |
 
-Single-line summary, useful for status bars or quick checks:
-
-```
-Go 77% · TS 16% · MD 3.5% · 45 files · 7,680 lines
-```
-
-## json
-
-Machine-readable, complete data:
+## JSON example
 
 ```json
 {
+  "repo": "A:/Projects/codeye",
   "ref": "main",
-  "tree": "dc7f118f...",
-  "scanned_at": "2026-03-06T10:00:00Z",
-  "elapsed_ms": 11,
+  "tree_sha": "a5bc10236b9bcf55b5446dd55325359fcb6acbdd",
+  "scan_ms": 55,
+  "cached": true,
+  "scanned_at": "2026-03-11T17:08:35.9428616Z",
+  "total": {
+    "name": "Total",
+    "files": 62,
+    "code": 6414,
+    "blank": 900,
+    "comment": 467,
+    "lines": 7781
+  },
   "languages": [
     {
       "name": "Go",
-      "files": 28,
-      "code": 3733,
-      "comments": 272,
-      "blanks": 441,
-      "total": 4446,
-      "pct": 77.0
+      "files": 31,
+      "code": 4247,
+      "blank": 500,
+      "comment": 415,
+      "lines": 5162,
+      "pct": 66.34
     }
-  ],
-  "totals": {
-    "files": 45,
-    "code": 6326,
-    "comments": 463,
-    "blanks": 891,
-    "total": 7680
-  }
+  ]
 }
 ```
 
-Usage with `jq`:
+## Examples
 
 ```bash
-codeye --format json | jq '.languages[] | select(.name == "Go") | .code'
-```
+# Pipe structured data into jq
+codeye --format json . | jq '.total.lines'
 
-## csv
+# Generate a CSV artifact
+codeye --format csv . > loc.csv
 
-Spreadsheet-friendly:
+# Append a Markdown summary to a changelog or README
+codeye --format markdown . >> REPORT.md
 
-```csv
-Language,Files,Code,Comments,Blanks,Total,Pct
-Go,28,3733,272,441,4446,77.0
-TypeScript,12,2104,188,310,2602,16.1
-```
-
-```bash
-codeye --format csv > loc.csv
-```
-
-## markdown
-
-Ready to paste into a README or wiki:
-
-```bash
-codeye --format markdown
-```
-
-Produces a GitHub Flavored Markdown table. Pipe it straight into your README:
-
-```bash
-codeye --format markdown >> README.md
-```
-
-## badge
-
-[Shields.io](https://shields.io/endpoint) endpoint-compatible JSON. Host it behind a URL and use as a live badge:
-
-```json
-{
-  "schemaVersion": 1,
-  "label": "lines of code",
-  "message": "7,680",
-  "color": "brightgreen"
-}
-```
-
-```bash
-# Write to a file served by your badge endpoint
-codeye --format badge > public/loc-badge.json
-```
-
-Then in your README:
-
-```markdown
-![Lines of Code](https://img.shields.io/endpoint?url=https://yoursite.dev/loc-badge.json)
+# Publish a Shields-compatible badge payload
+codeye --format badge . > public/codeye-badge.json
 ```

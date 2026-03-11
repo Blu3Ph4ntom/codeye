@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # install.sh — one-line installer for codeye
-# Usage: curl -sSfL https://raw.githubusercontent.com/codeye/codeye/main/install.sh | sh
+# Usage: curl -sSfL https://codeye.bluephantom.dev/install.sh | sh
 
 set -e
 

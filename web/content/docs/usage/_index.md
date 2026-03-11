@@ -1,109 +1,98 @@
 ---
 title: "Usage"
-description: "Complete reference for all codeye flags and commands."
+description: "Command reference for codeye."
 ---
 
 # Usage
 
-## Basic scan
+## Basic scans
 
 ```bash
-# Scan HEAD of the current repo
-codeye
+# Scan the current repository
+codeye .
 
-# Scan a specific branch or commit
-codeye --ref main
-codeye --ref HEAD~5
+# Scan a specific branch, tag, or commit
+codeye --branch main .
+codeye --branch HEAD~5 .
+
+# Filter to specific languages
+codeye --lang Go,Markdown .
+codeye --lang Go --lang TypeScript .
 ```
 
-## Flags
+`--ref` still works as a compatibility alias for `--branch`, but `--branch` is the canonical flag.
+
+## Main flags
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--ref <ref>` | `HEAD` | Git ref to scan (branch, tag, commit SHA) |
-| `--format <fmt>` | `table` | Output format: `table`, `json`, `csv`, `markdown`, `badge`, `compact` |
-| `--top <n>` | `0` (all) | Show only top N languages |
-| `--sort <field>` | `lines` | Sort by: `lines`, `code`, `files`, `name` |
-| `--desc` | `true` | Sort descending |
-| `--no-cache` | `false` | Skip cache read/write |
-| `--dry-run` | `false` | Print what would be scanned, don't count |
-| `--emoji` | `true` | Show language emoji icons |
-| `--nf` | `false` | Use Nerd Font glyphs (requires patched font) |
+| `--branch <ref>` | `HEAD` | Scan a branch, tag, or commit SHA |
+| `--format <fmt>` | `table` | `table`, `bar`, `spark`, `json`, `ndjson`, `csv`, `badge`, `markdown`, `compact` |
+| `--sort <field>` | `lines` | `lines`, `files`, `code`, `blank`, `comment`, `lang` |
+| `--top <n>` | `0` | Limit output rows |
+| `--lang <list>` | all | Comma-separated or repeated language filter |
+| `--exclude <glob>` | none | Exclude paths matching one or more globs |
+| `--path-filter <glob>` | none | Include only matching paths |
+| `--no-vendor` | `false` | Exclude vendor-like directories |
+| `--no-generated` | `false` | Exclude generated files such as `*.pb.go` |
+| `--no-tests` | `false` | Exclude common test file patterns |
+| `--min-lines <n>` | `0` | Hide languages below a line threshold |
+| `--no-cache` | `false` | Skip cache read and write |
+| `--no-color` | `false` | Disable ANSI colors |
+| `--no-header` | `false` | Suppress header and footer chrome |
+| `--wide` | `false` | Show blank and comment columns in table output |
+| `--compact` | `false` | Force compact terminal rendering |
 | `--pct` | `true` | Show percentage column |
-| `--blame` | `false` | Show per-author line ownership |
-| `--history` | `false` | Show week-by-week LoC growth |
-| `--hotspot` | `false` | Show most-churned files |
-| `--verbose` | `false` | Verbose stderr logging |
-| `--version` | | Print version and exit |
+| `--theme <name>` | `dark` | `dark`, `light`, `mono` |
+| `--workers <n>` | `GOMAXPROCS` | Worker pool size |
+| `--dry-run` | `false` | Print matching files without scanning |
+| `--config <path>` | auto | Explicit `.codeye.toml` path |
+| `--version` | `false` | Print version information and exit |
 
-## Blame mode
-
-Shows which author owns how many lines across the whole repo:
+## Analysis modes
 
 ```bash
-codeye --blame
+# Ownership by author
+codeye --blame .
+
+# Repository growth
+codeye --history --history-interval month .
+
+# High-churn files
+codeye --hotspots --top 20 .
+
+# Snapshot the repo at a historical date
+codeye --at 2025-12-31 .
 ```
 
-```
-Author                   Lines      %   Files
-────────────────────────────────────────────────
-alice@example.com        5,591  89.1%      38  ████████████████████████████████
-bob@example.com            685  10.9%       7  ████
+Related flags:
 
-total: 6,276 lines across 2 authors
-```
+| Flag | Description |
+|------|-------------|
+| `--blame` | Aggregate line ownership by author |
+| `--history` | Show repository growth over time |
+| `--history-interval <unit>` | `day`, `week`, `month`, `quarter`, or `year` |
+| `--history-limit <n>` | Maximum commits walked for history and hotspots |
+| `--hotspots` | Show most-changed files by churn score |
+| `--since <date>` | Limit history or hotspot analysis to newer commits |
+| `--until <date>` | Limit history analysis to older commits |
+| `--at <date>` | Resolve the repo state at or before a date |
+| `--speedtest` | Run three uncached scans and print timings |
 
-Blame runs `git blame --porcelain` on every file in parallel and aggregates by author email.
+`--interval` and `--hotspot` remain available as compatibility aliases for older docs.
 
-## History mode
-
-Shows lines-of-code growth bucketed by week, with a sparkline:
+## Subcommands
 
 ```bash
-codeye --history
-codeye --history --since 2024-01-01
-codeye --history --until 2024-06-01
+codeye diff <ref1> <ref2>
+codeye langs
+codeye doctor
+codeye cache status
+codeye cache clear
+codeye completion bash
+codeye version
 ```
 
-Additional history flags:
+## Non-git directories
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--since <date>` | (unbounded) | Start date `YYYY-MM-DD` |
-| `--until <date>` | (unbounded) | End date `YYYY-MM-DD` |
-| `--bucket <unit>` | `week` | Time bucket: `day`, `week`, `month` |
-
-## Hotspot mode
-
-Shows the files with the highest churn-to-size ratio:
-
-```bash
-codeye --hotspot
-codeye --hotspot --top 10
-```
-
-## Output formats
-
-```bash
-codeye --format json   | jq .
-codeye --format csv    > loc.csv
-codeye --format badge  # Shields.io-compatible JSON
-codeye --format markdown >> README.md
-```
-
-## Excluding paths
-
-Create a `.codeyeignore` file in the repo root — same syntax as `.gitignore`:
-
-```
-vendor/
-*.pb.go
-testdata/
-node_modules/
-```
-
-Or pass exclusion patterns inline:
-
-```bash
-codeye --exclude vendor/ --exclude '*.pb.go'
-```
+If the target path is not a git repository, `codeye` falls back to a direct directory walk for standard scans. Git-dependent analysis modes such as `--blame`, `--history`, and `--hotspots` still require a repository.

@@ -2,9 +2,11 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -37,9 +39,9 @@ type Config struct {
 	Wide     bool
 	Compact  bool
 	Pct      bool
-	Progress  bool
-	NerdFont  bool // use Nerd Font terminal glyphs (requires patched font)
-	Theme     string
+	Progress bool
+	NerdFont bool // use Nerd Font terminal glyphs (requires patched font)
+	Theme    string
 
 	// Analysis modes
 	History         bool
@@ -56,12 +58,12 @@ type Config struct {
 	At              string
 
 	// Performance & caching
-	Speedtest  bool
-	NoCache    bool
-	CacheDir   string
-	Workers    int
-	Profile    string
-	Trace      string
+	Speedtest bool
+	NoCache   bool
+	CacheDir  string
+	Workers   int
+	Profile   string
+	Trace     string
 
 	// Meta
 	Verbose bool
@@ -110,27 +112,194 @@ func DefaultCacheDir() string {
 	return filepath.Join(os.TempDir(), "codeye-cache")
 }
 
-// LoadFile loads config from a .codeye.toml file if present.
-func LoadFile(path string) error {
-	viper.SetConfigFile(path)
-	viper.SetConfigType("toml")
-	return viper.ReadInConfig()
+// Resolve loads configuration from defaults, optional home/project config files,
+// and CODEYE_* environment variables. CLI flags should be applied afterward.
+func Resolve(explicitPath, dir string) (*Config, string, error) {
+	cfg := DefaultConfig()
+	v := viper.New()
+	v.SetConfigType("toml")
+	v.SetEnvPrefix("CODEYE")
+	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	v.AutomaticEnv()
+
+	if homePath, ok := userConfigPath(); ok {
+		if err := mergeConfigFile(v, homePath, false); err != nil {
+			return nil, "", err
+		}
+	}
+
+	configPath := explicitPath
+	if configPath == "" {
+		configPath = os.Getenv("CODEYE_CONFIG")
+	}
+	if configPath == "" {
+		configPath = findProjectConfig(dir)
+	}
+	if err := mergeConfigFile(v, configPath, explicitPath != "" || os.Getenv("CODEYE_CONFIG") != ""); err != nil {
+		return nil, "", err
+	}
+
+	applyResolvedValues(cfg, v)
+	if os.Getenv("NO_COLOR") != "" {
+		cfg.NoColor = true
+	}
+
+	return cfg, configPath, nil
 }
 
-// LoadAuto searches for .codeye.toml starting from dir, walking up to filesystem root.
-func LoadAuto(dir string) (string, error) {
-	for {
-		candidate := filepath.Join(dir, ".codeye.toml")
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, LoadFile(candidate)
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
+func userConfigPath() (string, bool) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", false
 	}
-	return "", nil
+	path := filepath.Join(home, ".codeye.toml")
+	if _, err := os.Stat(path); err == nil {
+		return path, true
+	}
+	return "", false
+}
+
+func findProjectConfig(dir string) string {
+	abs, err := filepath.Abs(dir)
+	if err != nil {
+		return ""
+	}
+	for {
+		candidate := filepath.Join(abs, ".codeye.toml")
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+		parent := filepath.Dir(abs)
+		if parent == abs {
+			return ""
+		}
+		abs = parent
+	}
+}
+
+func mergeConfigFile(v *viper.Viper, path string, required bool) error {
+	if path == "" {
+		return nil
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		if required {
+			return fmt.Errorf("loading config %q: %w", path, err)
+		}
+		return nil
+	}
+	defer f.Close()
+
+	if err := v.MergeConfig(f); err != nil {
+		return fmt.Errorf("parsing config %q: %w", path, err)
+	}
+	return nil
+}
+
+func applyResolvedValues(cfg *Config, v *viper.Viper) {
+	cfg.Branch = stringValue(v, "branch", cfg.Branch)
+	cfg.Ref = stringValue(v, "ref", cfg.Ref)
+	cfg.Author = csvListValue(v, "author", cfg.Author)
+	cfg.Since = stringValue(v, "since", cfg.Since)
+	cfg.Until = stringValue(v, "until", cfg.Until)
+	cfg.PathFilter = csvListValue(v, "path_filter", cfg.PathFilter)
+	cfg.Exclude = csvListValue(v, "exclude", cfg.Exclude)
+	cfg.Lang = csvListValue(v, "lang", cfg.Lang)
+	cfg.NoVendor = boolValue(v, "no_vendor", cfg.NoVendor)
+	cfg.NoGenerated = boolValue(v, "no_generated", cfg.NoGenerated)
+	cfg.NoTests = boolValue(v, "no_tests", cfg.NoTests)
+	cfg.MinLines = intValue(v, "min_lines", cfg.MinLines)
+	cfg.Depth = intValue(v, "depth", cfg.Depth)
+	cfg.Format = NormalizeFormat(stringValue(v, "format", cfg.Format))
+	cfg.Sort = stringValue(v, "sort", cfg.Sort)
+	cfg.Desc = boolValue(v, "desc", cfg.Desc)
+	cfg.Top = intValue(v, "top", cfg.Top)
+	cfg.NoColor = boolValue(v, "no_color", cfg.NoColor)
+	cfg.NoHeader = boolValue(v, "no_header", cfg.NoHeader)
+	cfg.Wide = boolValue(v, "wide", cfg.Wide)
+	cfg.Compact = boolValue(v, "compact", cfg.Compact)
+	cfg.Pct = boolValue(v, "pct", cfg.Pct)
+	cfg.Progress = boolValue(v, "progress", cfg.Progress)
+	cfg.NerdFont = boolValue(v, "nerd_font", cfg.NerdFont) || boolValue(v, "nerd_fonts", cfg.NerdFont)
+	cfg.Theme = stringValue(v, "theme", cfg.Theme)
+	cfg.History = boolValue(v, "history", cfg.History)
+	cfg.HistoryInterval = stringValue(v, "history_interval", cfg.HistoryInterval)
+	cfg.HistoryLimit = intValue(v, "history_limit", cfg.HistoryLimit)
+	cfg.Blame = boolValue(v, "blame", cfg.Blame)
+	cfg.Hotspots = boolValue(v, "hotspots", cfg.Hotspots)
+	cfg.Contrib = boolValue(v, "contrib", cfg.Contrib)
+	cfg.At = stringValue(v, "at", cfg.At)
+	cfg.Speedtest = boolValue(v, "speedtest", cfg.Speedtest)
+	cfg.NoCache = boolValue(v, "no_cache", cfg.NoCache)
+	cfg.CacheDir = stringValue(v, "cache_dir", cfg.CacheDir)
+	cfg.Workers = intValue(v, "workers", cfg.Workers)
+	cfg.Verbose = boolValue(v, "verbose", cfg.Verbose)
+	cfg.DryRun = boolValue(v, "dry_run", cfg.DryRun)
+}
+
+func stringValue(v *viper.Viper, key, fallback string) string {
+	if !v.IsSet(key) {
+		return fallback
+	}
+	value := strings.TrimSpace(v.GetString(key))
+	if value == "" {
+		return fallback
+	}
+	return value
+}
+
+func boolValue(v *viper.Viper, key string, fallback bool) bool {
+	if !v.IsSet(key) {
+		return fallback
+	}
+	raw := strings.TrimSpace(v.GetString(key))
+	if raw == "" {
+		return fallback
+	}
+	parsed, err := strconv.ParseBool(raw)
+	if err != nil {
+		return fallback
+	}
+	return parsed
+}
+
+func intValue(v *viper.Viper, key string, fallback int) int {
+	if !v.IsSet(key) {
+		return fallback
+	}
+	raw := strings.TrimSpace(v.GetString(key))
+	if raw == "" {
+		return fallback
+	}
+	parsed, err := strconv.Atoi(raw)
+	if err != nil {
+		return fallback
+	}
+	return parsed
+}
+
+func csvListValue(v *viper.Viper, key string, fallback []string) []string {
+	if !v.IsSet(key) {
+		return fallback
+	}
+	items := normalizeList(v.GetStringSlice(key))
+	if len(items) > 0 {
+		return items
+	}
+	return normalizeList([]string{v.GetString(key)})
+}
+
+func normalizeList(values []string) []string {
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		for _, part := range strings.Split(value, ",") {
+			part = strings.TrimSpace(part)
+			if part != "" {
+				out = append(out, part)
+			}
+		}
+	}
+	return out
 }
 
 // VendorDirs is the list of directories auto-excluded by --no-vendor.
@@ -146,7 +315,7 @@ var VendorDirs = []string{
 	"venv/",
 	"env/",
 	".env/",
-	"target/",       // Rust/Maven
+	"target/", // Rust/Maven
 	"build/",
 	"dist/",
 	"out/",

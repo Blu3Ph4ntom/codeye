@@ -23,7 +23,7 @@ type Entry struct {
 	Data     json.RawMessage `json:"data"`
 }
 
-const currentVersion = 1
+const currentVersion = 2
 
 // Cache manages a directory of cached scan results.
 type Cache struct {

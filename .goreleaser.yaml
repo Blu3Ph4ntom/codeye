@@ -92,64 +92,21 @@ changelog:
 
 release:
   github:
-    owner: codeye
+    owner: Blu3Ph4ntom
     name: codeye
-  name_template: "v{{ .Version }}"
+  name_template: "{{ .ProjectName }} {{ .Tag }}"
   footer: |
     ## Install
 
-    **Homebrew:**
-    ```
-    brew install codeye/tap/codeye
-    ```
-
     **Direct download:**
     ```
-    curl -sSfL https://raw.githubusercontent.com/codeye/codeye/main/install.sh | sh
+    curl -sSfL https://raw.githubusercontent.com/Blu3Ph4ntom/codeye/main/install.sh | sh
     ```
 
     **Go install:**
     ```
     go install github.com/blu3ph4ntom/codeye/cmd/codeye@latest
     ```
-
-brews:
-  - name: codeye
-    repository:
-      owner: codeye
-      name: homebrew-tap
-    directory: Formula
-    homepage: "https://github.com/blu3ph4ntom/codeye"
-    description: "Fast lines-of-code scanner for git repositories"
-    license: "MIT"
-    test: |
-      system "#{bin}/codeye", "--version"
-    install: |
-      bin.install "codeye"
-      bash_completion.install "completions/codeye.bash" => "codeye"
-      zsh_completion.install "completions/_codeye" => "_codeye"
-      fish_completion.install "completions/codeye.fish"
-
-nfpms:
-  - id: packages
-    package_name: codeye
-    formats:
-      - deb
-      - rpm
-      - apk
-    vendor: codeye
-    homepage: https://github.com/blu3ph4ntom/codeye
-    maintainer: "codeye <hello@codeye.dev>"
-    description: "Fast lines-of-code scanner for git repositories"
-    license: MIT
-    bindir: /usr/bin
-    contents:
-      - src: ./completions/codeye.bash
-        dst: /usr/share/bash-completion/completions/codeye
-      - src: ./completions/_codeye
-        dst: /usr/share/zsh/vendor-completions/_codeye
-      - src: ./completions/codeye.fish
-        dst: /usr/share/fish/completions/codeye.fish
 
 sboms:
   - artifacts: archive
