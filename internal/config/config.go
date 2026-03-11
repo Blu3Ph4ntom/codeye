@@ -75,7 +75,9 @@ func DefaultConfig() *Config {
 	return &Config{
 		Format:          "table",
 		Sort:            "lines",
+		Desc:            true,
 		Top:             0, // 0 = show all
+		Pct:             true,
 		Theme:           "dark",
 		NerdFont:        os.Getenv("CODEYE_NERD_FONTS") == "1" || os.Getenv("NERD_FONTS") == "1", // opt-in; set CODEYE_NERD_FONTS=1 or use --nf flag
 		HistoryInterval: "week",

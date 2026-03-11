@@ -10,12 +10,18 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 )
 
-// binaryPath returns the path to the codeye binary to test.
-// It prefers a pre-built binary in the repository root, and falls back to
-// building from source.
+var (
+	buildOnce sync.Once
+	builtBin  string
+	buildErr  error
+	buildOut  []byte
+)
+
+// binaryPath returns the path to a freshly built codeye binary for the current test run.
 func binaryPath(t *testing.T) string {
 	t.Helper()
 
@@ -27,24 +33,30 @@ func binaryPath(t *testing.T) string {
 	// testdata/integration/<file> → repo root is ../../..
 	repoRoot := filepath.Join(filepath.Dir(thisFile), "..", "..")
 
-	bin := filepath.Join(repoRoot, "codeye")
-	if runtime.GOOS == "windows" {
-		bin += ".exe"
+	buildOnce.Do(func() {
+		tmpDir, err := os.MkdirTemp("", "codeye-integration-*")
+		if err != nil {
+			buildErr = err
+			return
+		}
+		bin := filepath.Join(tmpDir, "codeye")
+		if runtime.GOOS == "windows" {
+			bin += ".exe"
+		}
+		cmd := exec.Command("go", "build", "-o", bin, "./cmd/codeye")
+		cmd.Dir = repoRoot
+		cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
+		if out, err := cmd.CombinedOutput(); err != nil {
+			buildErr = err
+			buildOut = out
+			return
+		}
+		builtBin = bin
+	})
+	if buildErr != nil {
+		t.Fatalf("build failed: %v\n%s", buildErr, buildOut)
 	}
-
-	if _, err := os.Stat(bin); err == nil {
-		return bin
-	}
-
-	// Binary not found — build it.
-	t.Log("binary not found, building from source...")
-	cmd := exec.Command("go", "build", "-o", bin, "./cmd/codeye")
-	cmd.Dir = repoRoot
-	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
-	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Fatalf("build failed: %v\n%s", err, out)
-	}
-	return bin
+	return builtBin
 }
 
 // requireGit skips the test if git is not available.

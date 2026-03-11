@@ -359,6 +359,7 @@ func runStandardScan(repo *git.Repo, cfg *config.Config, w *os.File) error {
 			if json.Unmarshal(data, &sr) == nil {
 				sr.Cached = true
 				sr.ScanMs = time.Since(start).Milliseconds()
+				scanner.SortLangs(sr.Langs, cfg.Sort, cfg.Desc)
 				result = &sr
 			}
 		}

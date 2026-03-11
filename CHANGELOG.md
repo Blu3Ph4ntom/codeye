@@ -7,6 +7,19 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Pages deployment workflow for `codeye.bluephantom.dev`
+- Community health files: contributing guide, security policy, support guide, code of conduct, issue templates, and pull request template
+- Tests for layered config loading and comma-separated language filters
+
+### Changed
+
+- Activated real `.codeye.toml` and `CODEYE_*` config resolution in the CLI
+- Added compatibility aliases for older flags such as `--ref` and `--hotspot`
+- Refreshed the README, website, and docs to match actual current behavior
+- Simplified release metadata so GoReleaser targets the real repository and available assets
+
 ## [0.1.0] — 2024-01-01
 
 ### Added
