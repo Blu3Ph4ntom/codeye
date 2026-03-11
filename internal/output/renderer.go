@@ -9,16 +9,16 @@ import (
 
 // RenderOpts carries display preferences to renderers.
 type RenderOpts struct {
-	NoColor   bool
-	NoHeader  bool
-	Wide      bool
-	Compact   bool
-	Pct       bool
-	NerdFont  bool // use Nerd Font glyphs (requires a patched Nerd Font in terminal)
-	Theme     string
-	Top       int
-	Sort      string
-	Desc      bool
+	NoColor  bool
+	NoHeader bool
+	Wide     bool
+	Compact  bool
+	Pct      bool
+	NerdFont bool // use Nerd Font glyphs (requires a patched Nerd Font in terminal)
+	Theme    string
+	Top      int
+	Sort     string
+	Desc     bool
 }
 
 // Renderer is the interface all output formats implement.

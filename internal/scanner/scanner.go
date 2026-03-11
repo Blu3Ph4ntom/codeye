@@ -12,12 +12,12 @@ import (
 
 // LangStats holds counts for a single language.
 type LangStats struct {
-	Name     string
-	Files    int
-	Code     int64
-	Blank    int64
-	Comment  int64
-	Lines    int64
+	Name    string
+	Files   int
+	Code    int64
+	Blank   int64
+	Comment int64
+	Lines   int64
 }
 
 // Total returns total lines.
@@ -27,29 +27,29 @@ func (s *LangStats) Total() int64 {
 
 // ScanResult is the aggregated output of a scan.
 type ScanResult struct {
-	Repo     string
-	Ref      string
-	TreeSHA  string
-	ScanMs   int64
-	Cached   bool
-	Files    int
-	Total    LangStats
-	Langs    []LangStats // sorted by Lines desc
+	Repo    string
+	Ref     string
+	TreeSHA string
+	ScanMs  int64
+	Cached  bool
+	Files   int
+	Total   LangStats
+	Langs   []LangStats // sorted by Lines desc
 }
 
 // ScanOpts controls scanning behavior.
 type ScanOpts struct {
 	RepoRoot    string
-	Ref         string          // git ref to scan (default: working tree)
-	Exclude     []string        // glob patterns to exclude
-	Include     []string        // glob patterns to include (empty = all)
+	Ref         string   // git ref to scan (default: working tree)
+	Exclude     []string // glob patterns to exclude
+	Include     []string // glob patterns to include (empty = all)
 	NoVendor    bool
 	NoGenerated bool
 	NoTests     bool
-	LangFilter  []string        // only these languages
+	LangFilter  []string // only these languages
 	MinLines    int
 	Workers     int
-	DryRun      bool            // list files but don't count
+	DryRun      bool // list files but don't count
 }
 
 // fileJob is a unit of work sent to a worker goroutine.

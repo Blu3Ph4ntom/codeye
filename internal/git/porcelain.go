@@ -274,7 +274,9 @@ func parseShortlog(out string) []AuthorStat {
 		}
 		var commits int64
 		var rest string
-		fmt.Sscanf(line, "%d\t%[^\n]", &commits, &rest)
+		if _, err := fmt.Sscanf(line, "%d\t%[^\n]", &commits, &rest); err != nil {
+			continue
+		}
 		// rest is "Name <email>"
 		name, email := parseNameEmail(rest)
 		stats = append(stats, AuthorStat{Name: name, Email: email, Commits: commits})
@@ -329,10 +331,14 @@ func parseNumstat(out string) []LogEntry {
 		if len(parts) == 3 {
 			var added, deleted int64
 			if parts[0] != "-" {
-				fmt.Sscanf(parts[0], "%d", &added)
+				if _, err := fmt.Sscanf(parts[0], "%d", &added); err != nil {
+					continue
+				}
 			}
 			if parts[1] != "-" {
-				fmt.Sscanf(parts[1], "%d", &deleted)
+				if _, err := fmt.Sscanf(parts[1], "%d", &deleted); err != nil {
+					continue
+				}
 			}
 			current.Added += added
 			current.Deleted += deleted

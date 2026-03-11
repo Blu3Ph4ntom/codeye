@@ -13,24 +13,24 @@ import (
 type JSONRenderer struct{}
 
 type jsonOutput struct {
-	Repo      string        `json:"repo"`
-	Ref       string        `json:"ref"`
-	TreeSHA   string        `json:"tree_sha,omitempty"`
-	ScanMs    int64         `json:"scan_ms"`
-	Cached    bool          `json:"cached"`
-	ScannedAt time.Time     `json:"scanned_at"`
-	Total     jsonLang      `json:"total"`
-	Languages []jsonLang    `json:"languages"`
+	Repo      string     `json:"repo"`
+	Ref       string     `json:"ref"`
+	TreeSHA   string     `json:"tree_sha,omitempty"`
+	ScanMs    int64      `json:"scan_ms"`
+	Cached    bool       `json:"cached"`
+	ScannedAt time.Time  `json:"scanned_at"`
+	Total     jsonLang   `json:"total"`
+	Languages []jsonLang `json:"languages"`
 }
 
 type jsonLang struct {
-	Name    string   `json:"name"`
-	Files   int      `json:"files"`
-	Code    int64    `json:"code"`
-	Blank   int64    `json:"blank"`
-	Comment int64    `json:"comment"`
-	Lines   int64    `json:"lines"`
-	Pct     float64  `json:"pct,omitempty"`
+	Name    string  `json:"name"`
+	Files   int     `json:"files"`
+	Code    int64   `json:"code"`
+	Blank   int64   `json:"blank"`
+	Comment int64   `json:"comment"`
+	Lines   int64   `json:"lines"`
+	Pct     float64 `json:"pct,omitempty"`
 }
 
 func (j *JSONRenderer) Render(w io.Writer, result *scanner.ScanResult, opts RenderOpts) error {

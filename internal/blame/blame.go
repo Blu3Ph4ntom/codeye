@@ -10,11 +10,11 @@ import (
 
 // AuthorOwnership holds line ownership stats for one author.
 type AuthorOwnership struct {
-	Email  string
-	Name   string
-	Lines  int64
-	Files  int
-	Pct    float64
+	Email string
+	Name  string
+	Lines int64
+	Files int
+	Pct   float64
 }
 
 // Result is the aggregate blame result for a repo.

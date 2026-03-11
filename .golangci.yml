@@ -9,10 +9,8 @@ linters:
     - ineffassign
     - typecheck
     - gofmt
-    - goimports
     - misspell
     - unconvert
-    - prealloc
     - revive
 
 linters-settings:

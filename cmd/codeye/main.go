@@ -103,8 +103,6 @@ func newRootCmd() *cobra.Command {
 			// --nf flag enables Nerd Fonts; env var CODEYE_NERD_FONTS=1 also enables it (already in cfg from DefaultConfig).
 			if cmd.Flags().Changed("nf") {
 				cfg.NerdFont = f.nerdFont
-			} else {
-				// keep DefaultConfig value (env var may have set it)
 			}
 			return runScan(dir, cfg)
 		},
@@ -764,7 +762,7 @@ func completionCmd(root *cobra.Command) *cobra.Command {
 		Use:       "completion [bash|zsh|fish|powershell]",
 		Short:     "generate shell completion",
 		ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
-		Args:      cobra.ExactValidArgs(1),
+		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			switch args[0] {
 			case "bash":
