@@ -11,6 +11,8 @@ jobs:
   test:
     name: test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    env:
+      CGO_ENABLED: 0
     strategy:
       fail-fast: false
       matrix:
@@ -27,13 +29,13 @@ jobs:
           cache: true
 
       - name: go vet
-        run: CGO_ENABLED=0 go vet ./...
+        run: go vet ./...
 
       - name: test
-        run: CGO_ENABLED=0 go test -count=1 -timeout=120s ./...
+        run: go test -count=1 -timeout=120s ./...
 
       - name: build
-        run: CGO_ENABLED=0 go build -ldflags "-s -w" -o codeye${{ runner.os == 'Windows' && '.exe' || '' }} ./cmd/codeye
+        run: go build -ldflags "-s -w" -o codeye${{ runner.os == 'Windows' && '.exe' || '' }} ./cmd/codeye
 
       - name: smoke test
         shell: bash
@@ -46,6 +48,8 @@ jobs:
     name: benchmarks
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+    env:
+      CGO_ENABLED: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +62,7 @@ jobs:
           cache: true
 
       - name: run benchmarks
-        run: CGO_ENABLED=0 go test -run='^$' -bench=. -benchmem -benchtime=3s ./... | tee bench.txt
+        run: go test -run='^$' -bench=. -benchmem -benchtime=3s ./... | tee bench.txt
 
       - name: upload bench results
         uses: actions/upload-artifact@v4
@@ -88,6 +92,8 @@ jobs:
   coverage:
     name: coverage
     runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +106,7 @@ jobs:
           cache: true
 
       - name: coverage
-        run: CGO_ENABLED=0 go test -count=1 -coverprofile=coverage.out ./...
+        run: go test -count=1 -coverprofile=coverage.out ./...
 
       - name: upload to codecov
         uses: codecov/codecov-action@v4
