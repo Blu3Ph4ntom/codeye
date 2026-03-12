@@ -1,23 +1,29 @@
-# Linguist overrides to make GitHub show 100% Go for the whole repo
-# We treat everything except internal Go code as generated or data
+* text=auto
 
-# Ignore website (it's not part of the core tool)
-web/* linguist-documentation
-web/themes/* linguist-vendored
+# Keep GitHub Linguist focused on the Go CLI implementation.
+*.go linguist-detectable=true
 
-# Ignore test data and mocks
-testdata/* linguist-vendored
-*_test.go linguist-documentation
+# Exclude the website, docs, branding, and repo management files from language stats.
+web/** linguist-generated=true
+docs/** linguist-generated=true
+branding/** linguist-generated=true
+.github/** linguist-generated=true
 
-# Ignore config and build shits
-*.toml linguist-generated
-*.yaml linguist-generated
-*.yml linguist-generated
-Makefile linguist-generated
-install.sh linguist-generated
-.goreleaser.yaml linguist-generated
-.golangci.yml linguist-generated
+# Exclude documentation and support content.
+*.md linguist-documentation=true
+LICENSE linguist-documentation=true
+AGENTS.md linguist-documentation=true
 
-# Explicitly mark internal Go packages as the primary source
-internal/**/*.go linguist-detectable
-cmd/**/*.go linguist-detectable
+# Exclude build, config, and metadata files from language breakdowns.
+*.svg linguist-generated=true
+*.toml linguist-generated=true
+*.yaml linguist-generated=true
+*.yml linguist-generated=true
+*.sh linguist-generated=true
+*.ps1 linguist-generated=true
+*.txt linguist-generated=true
+*.out linguist-generated=true
+Makefile linguist-generated=true
+.codeyeignore linguist-generated=true
+.gitignore linguist-generated=true
+.gitattributes linguist-generated=true
