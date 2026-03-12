@@ -125,6 +125,31 @@ func main() {
 	}
 }
 
+func TestCountLinesWithMultilineDocstring(t *testing.T) {
+	dir := t.TempDir()
+	initGitRepo(t, dir)
+
+	src := "\"\"\"module docstring\ncontinues here\n\"\"\"\n\ndef main():\n    return 1\n"
+	err := os.WriteFile(filepath.Join(dir, "docstring.py"), []byte(src), 0o644)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runCmd(t, dir, "git", "add", ".")
+
+	result, err := scanner.Scan([]string{"docstring.py"}, dir, scanner.ScanOpts{RepoRoot: dir, Workers: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.Total.Comment == 0 {
+		t.Fatal("expected multiline docstring to count as comment")
+	}
+	if result.Total.Code == 0 {
+		t.Fatal("expected function body to count as code")
+	}
+}
+
 func TestFilterFiles(t *testing.T) {
 	files := []string{
 		"main.go",

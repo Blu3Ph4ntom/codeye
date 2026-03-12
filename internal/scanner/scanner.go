@@ -223,7 +223,7 @@ func countLines(buf []byte, def LangDef) (code, blank, comment int64) {
 	}
 
 	inBlock := false
-	blockEndIdx := -1
+	blockEndToken := ""
 
 	for _, rawLine := range lines {
 		line := bytes.TrimSpace(rawLine)
@@ -239,12 +239,9 @@ func countLines(buf []byte, def LangDef) (code, blank, comment int64) {
 		// Block comment tracking
 		if inBlock {
 			comment++
-			// Check for block end on this line
-			if blockEndIdx < len(def.BlockEnd) {
-				end := def.BlockEnd[blockEndIdx]
-				if strings.Contains(lineStr, end) {
-					inBlock = false
-				}
+			if blockEndToken != "" && strings.Contains(lineStr, blockEndToken) {
+				inBlock = false
+				blockEndToken = ""
 			}
 			continue
 		}
@@ -255,11 +252,12 @@ func countLines(buf []byte, def LangDef) (code, blank, comment int64) {
 			if strings.HasPrefix(lineStr, bs) {
 				comment++
 				inBlock = true
-				blockEndIdx = i
+				blockEndToken = def.BlockEnd[i]
 				// Check if block ends on same line
-				endIdx := strings.Index(lineStr[len(bs):], def.BlockEnd[i])
+				endIdx := strings.Index(lineStr[len(bs):], blockEndToken)
 				if endIdx >= 0 {
 					inBlock = false
+					blockEndToken = ""
 				}
 				blockStarted = true
 				break
@@ -280,10 +278,7 @@ func countLines(buf []byte, def LangDef) (code, blank, comment int64) {
 					// Single-line docstring
 				} else {
 					inBlock = true
-					blockEndIdx = -1
-					// Use docstring end as block end (simple approximation)
-					// We'll handle this by looking for the end token
-					_ = endToken
+					blockEndToken = endToken
 				}
 				blockStarted = true
 				break
